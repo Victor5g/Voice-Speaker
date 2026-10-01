@@ -1,11 +1,77 @@
-build/
-.build/
-cache/
-artifacts/
-tools/downloads/
-models/*.bin
-models/*.onnx
-*.xcuserstate
+# Local build products, downloaded tools and development evidence.
+/build/
+/.build/
+/cache/
+/artifacts/
+/tools/downloads/
+/third_party/SourcePackages/
+DerivedData/
+.swiftpm/
+
+# Model payloads, including tokenizers, voice data and compiled Core ML bundles.
+# Keep models/*.json: manifests, hashes, download locks and selected profiles.
+/models/optional/
+/models/**/*.bin
+/models/**/*.onnx
+/models/**/*.safetensors
+/models/**/*.gguf
+/models/**/*.pt
+/models/**/*.pth
+/models/**/*.mlmodel
+/models/**/*.mlmodelc/
+/models/**/*.mlpackage/
+
+# App packages, native binaries and diagnostic bundles.
+*.app/
+*.dmg
+*.pkg
+*.o
+*.a
+*.dylib
+*.so
+*.dSYM/
+*.xcarchive/
+*.xcresult/
+
+# Personal Xcode/IDE state; shared schemes and project files stay versioned.
 xcuserdata/
-.DS_Store
+*.xcuserstate
+*.xccheckout
+*.xcscmblueprint
+/.idea/
+/.vscode/
+
+# Python environments and caches used for conversion and development tests.
 __pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# Local environment values and private signing material.
+.env
+.env.*
+!.env.example
+!.env.sample
+!.env.template
+*.p12
+*.pfx
+*.mobileprovision
+*.key
+*.pem
+
+# macOS and editor temporary files.
+.DS_Store
+._*
+*.swp
+*.swo
+*.tmp
+*~
+
+# Keep vendored native sources, dependency locks/patches, app resources,
+# licenses and test fixtures. Do not blanket-ignore third_party/, *.json or audio.
