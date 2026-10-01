@@ -1,0 +1,23 @@
+{
+  "fixtureType": "authored bilingual references; semantic review required",
+  "pt-en": [
+    {"id":"negation","source":"Eu não autorizei o pagamento.","reference":"I did not authorize the payment."},
+    {"id":"numbers","source":"Preciso de vinte e três ingressos para amanhã.","reference":"I need twenty-three tickets for tomorrow."},
+    {"id":"names","source":"A Ana vai encontrar o João em Fortaleza.","reference":"Ana is going to meet João in Fortaleza."},
+    {"id":"brazil","source":"O ônibus está atrasado e meu celular ficou sem bateria.","reference":"The bus is late and my cell phone ran out of battery."},
+    {"id":"question","source":"Você pode falar mais devagar, por favor?","reference":"Can you speak more slowly, please?"},
+    {"id":"condition","source":"Se chover, nós não vamos sair.","reference":"If it rains, we will not go out."},
+    {"id":"past","source":"Eu já enviei o documento ontem.","reference":"I already sent the document yesterday."},
+    {"id":"amount","source":"O total é cento e vinte reais, não duzentos.","reference":"The total is one hundred and twenty reais, not two hundred."}
+  ],
+  "en-pt": [
+    {"id":"negation","source":"I did not authorize the payment.","reference":"Eu não autorizei o pagamento."},
+    {"id":"numbers","source":"I need twenty-three tickets for tomorrow.","reference":"Preciso de vinte e três ingressos para amanhã."},
+    {"id":"names","source":"Ana is going to meet João in Fortaleza.","reference":"A Ana vai encontrar o João em Fortaleza."},
+    {"id":"brazil","source":"The bus is late and my cell phone ran out of battery.","reference":"O ônibus está atrasado e meu celular ficou sem bateria."},
+    {"id":"question","source":"Can you speak more slowly, please?","reference":"Você pode falar mais devagar, por favor?"},
+    {"id":"condition","source":"If it rains, we will not go out.","reference":"Se chover, nós não vamos sair."},
+    {"id":"past","source":"I already sent the document yesterday.","reference":"Eu já enviei o documento ontem."},
+    {"id":"amount","source":"The total is one hundred and twenty reais, not two hundred.","reference":"O total é cento e vinte reais, não duzentos."}
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "profile": "Balanced",
+  "filename": "optional/ggml-small.bin",
+  "sha256": "1be3a9b2063867b937e64e2ec7483364a79917e157fa98c5d94b5c1fffea987b",
+  "measuredAt": "2026-09-11T18:45:48.247826+00:00",
+  "hardware": "Apple M2 Pro",
+  "basis": "Balanced small/INT8 passed complete native PT/EN pipeline and has lowest human mean WER (0.0889822 on 12 FLEURS clips). Base/INT8 previously passed but failed the current complete-pipeline semantic regression: reuniao became reunir and meeting became gathering. Eco is withheld pending consistent accuracy. Tiny human mean WER 0.224499 exceeds exploratory 0.20 threshold. Quality FP32 translation triggered memory admission denial.",
+  "evidence": "artifacts/profile-comparison.json",
+  "profiles": [
+    {
+      "id": "Balanced",
+      "filename": "optional/ggml-small.bin",
+      "sha256": "1be3a9b2063867b937e64e2ec7483364a79917e157fa98c5d94b5c1fffea987b"
+    }
+  ],
+  "asrBackend": "metal",
+  "accelerationEvidence": "artifacts/coreml-comparison/summary.json",
+  "accelerationPolicy": "Core ML is user-selectable experimentally. Keep Metal as default until Core ML matches quality and full-pipeline gates; no assumption that ANE is fastest."
+}

@@ -1,0 +1,259 @@
+--- a/include/whisper.h
++++ b/include/whisper.h
+@@ -126,6 +126,13 @@
+         struct whisper_aheads dtw_aheads;
+ 
+         size_t dtw_mem_size; // TODO: remove
++
++        // LocalVoiceTranslator: explicit per-context encoder backend. No global
++        // environment switches, implicit model discovery or silent fallback.
++        // 0 = disabled, 1 = CPU+ANE, 2 = all, 3 = CPU+GPU.
++        int coreml_compute_units;
++        const char * coreml_model_path; // consumed during context initialization
++        bool reuse_encoder; // identical mel generation + offset + audio context only
+     };
+ 
+     typedef struct whisper_token_data {
+--- a/src/coreml/whisper-encoder.h
++++ b/src/coreml/whisper-encoder.h
+@@ -11,15 +11,16 @@
+ 
+ struct whisper_coreml_context;
+ 
+-struct whisper_coreml_context * whisper_coreml_init(const char * path_model);
++struct whisper_coreml_context * whisper_coreml_init(const char * path_model, int compute_units);
+ void whisper_coreml_free(struct whisper_coreml_context * ctx);
+ 
+-void whisper_coreml_encode(
++int whisper_coreml_encode(
+         const whisper_coreml_context * ctx,
+                              int64_t   n_ctx,
+                              int64_t   n_mel,
+                                float * mel,
+-                               float * out);
++                               float * out,
++                               int64_t out_count);
+ 
+ #if __cplusplus
+ }
+--- a/src/coreml/whisper-encoder.mm
++++ b/src/coreml/whisper-encoder.mm
+@@ -8,6 +8,7 @@
+ #import <CoreML/CoreML.h>
+ 
+ #include <stdlib.h>
++#include <cmath>
+ 
+ #if __cplusplus
+ extern "C" {
+@@ -17,16 +18,20 @@
+     const void * data;
+ };
+ 
+-struct whisper_coreml_context * whisper_coreml_init(const char * path_model) {
++struct whisper_coreml_context * whisper_coreml_init(const char * path_model, int compute_units) {
++    @autoreleasepool {
+     NSString * path_model_str = [[NSString alloc] initWithUTF8String:path_model];
+ 
+     NSURL * url_model = [NSURL fileURLWithPath: path_model_str];
+ 
+     // select which device to run the Core ML model on
+     MLModelConfiguration *config = [[MLModelConfiguration alloc] init];
+-    // config.computeUnits = MLComputeUnitsCPUAndGPU;
+-    //config.computeUnits = MLComputeUnitsCPUAndNeuralEngine;
+-    config.computeUnits = MLComputeUnitsAll;
++    switch (compute_units) {
++        case 1: config.computeUnits = MLComputeUnitsCPUAndNeuralEngine; break;
++        case 2: config.computeUnits = MLComputeUnitsAll; break;
++        case 3: config.computeUnits = MLComputeUnitsCPUAndGPU; break;
++        default: return NULL;
++    }
+ 
+     const void * data = CFBridgingRetain([[whisper_encoder_impl alloc] initWithContentsOfURL:url_model configuration:config error:nil]);
+ 
+@@ -39,6 +44,7 @@
+     ctx->data = data;
+ 
+     return ctx;
++    }
+ }
+ 
+ void whisper_coreml_free(struct whisper_coreml_context * ctx) {
+@@ -46,12 +52,14 @@
+     delete ctx;
+ }
+ 
+-void whisper_coreml_encode(
++int whisper_coreml_encode(
+         const whisper_coreml_context * ctx,
+                              int64_t   n_ctx,
+                              int64_t   n_mel,
+                                float * mel,
+-                               float * out) {
++                               float * out,
++                               int64_t out_count) {
++    @autoreleasepool {
+     MLMultiArray * inMultiArray = [
+         [MLMultiArray alloc] initWithDataPointer: mel
+                                            shape: @[@1, @(n_mel), @(n_ctx)]
+@@ -61,10 +69,20 @@
+                                            error: nil
+     ];
+ 
+-    @autoreleasepool {
++        if (!inMultiArray) return 0;
+         whisper_encoder_implOutput * outCoreML = [(__bridge id) ctx->data predictionFromLogmel_data:inMultiArray error:nil];
+-
+-        memcpy(out, outCoreML.output.dataPointer, outCoreML.output.count * sizeof(float));
++        MLMultiArray * output = outCoreML.output;
++        if (!output || output.dataType != MLMultiArrayDataTypeFloat32 || output.count != out_count) return 0;
++        // Reject a changed output layout before copying into the ggml buffer.
++        NSInteger stride = 1;
++        for (NSInteger i = output.shape.count - 1; i >= 0; --i) {
++            if (output.strides[i].integerValue != stride) return 0;
++            stride *= output.shape[i].integerValue;
++        }
++        const float * values = (const float *)output.dataPointer;
++        for (int64_t i = 0; i < out_count; ++i) if (!std::isfinite(values[i])) return 0;
++        memcpy(out, values, out_count * sizeof(float));
++        return 1;
+     }
+ }
+ 
+--- a/src/whisper.cpp
++++ b/src/whisper.cpp
+@@ -877,6 +877,9 @@
+     // result of the encoder
+     struct ggml_tensor * embd_conv = nullptr;
+     struct ggml_tensor * embd_enc  = nullptr;
++    bool encoder_reusable = false;
++    int encoder_mel_offset = -1;
++    int encoder_audio_ctx = -1;
+ 
+     // helpers for GPU offloading
+     std::vector<float> inp_mel;
+@@ -2362,6 +2365,10 @@
+               const int   n_threads,
+     ggml_abort_callback   abort_callback,
+                    void * abort_callback_data) {
++    if (abort_callback && abort_callback(abort_callback_data)) return false;
++    if (wctx.params.reuse_encoder && wstate.encoder_reusable &&
++        wstate.encoder_mel_offset == mel_offset && wstate.encoder_audio_ctx == wstate.exp_n_audio_ctx) return true;
++    wstate.encoder_reusable = false;
+     const int64_t t_start_us = ggml_time_us();
+ 
+     // conv
+@@ -2410,7 +2417,11 @@
+             ggml_backend_sched_reset(sched);
+ 
+ #if defined(WHISPER_USE_COREML)
+-            whisper_coreml_encode(wstate.ctx_coreml, mel->ne[0], mel->ne[1], (float *) mel->data, (float *) wstate.embd_enc->data);
++            if (!whisper_coreml_encode(wstate.ctx_coreml, mel->ne[0], mel->ne[1], (float *) mel->data,
++                                      (float *) wstate.embd_enc->data, ggml_nelements(wstate.embd_enc))) {
++                WHISPER_LOG_ERROR("%s: Core ML encoder inference failed\n", __func__);
++                return false;
++            }
+ #elif defined(WHISPER_USE_OPENVINO)
+             whisper_openvino_encode(wstate.ctx_openvino, mel, wstate.embd_enc);
+ #endif
+@@ -2451,8 +2462,11 @@
+ 
+     wstate.t_encode_us += ggml_time_us() - t_start_us;
+     wstate.n_encode++;
+-
+-    return !(abort_callback && abort_callback(abort_callback_data));
++    if (abort_callback && abort_callback(abort_callback_data)) return false;
++    wstate.encoder_mel_offset = mel_offset;
++    wstate.encoder_audio_ctx = wstate.exp_n_audio_ctx;
++    wstate.encoder_reusable = true;
++    return true;
+ }
+ 
+ static struct ggml_cgraph * whisper_build_graph_decoder(
+@@ -3438,20 +3452,25 @@
+     }
+ 
+ #ifdef WHISPER_USE_COREML
+-    const auto path_coreml = whisper_get_coreml_path_encoder(ctx->path_model);
++    if (ctx->params.coreml_compute_units != 0) {
++    const auto path_coreml = ctx->params.coreml_model_path ? std::string(ctx->params.coreml_model_path) : whisper_get_coreml_path_encoder(ctx->path_model);
+ 
+     WHISPER_LOG_INFO("%s: loading Core ML model from '%s'\n", __func__, path_coreml.c_str());
+     WHISPER_LOG_INFO("%s: first run on a device may take a while ...\n", __func__);
+ 
+-    state->ctx_coreml = whisper_coreml_init(path_coreml.c_str());
++    state->ctx_coreml = whisper_coreml_init(path_coreml.c_str(), ctx->params.coreml_compute_units);
+     if (!state->ctx_coreml) {
+         WHISPER_LOG_ERROR("%s: failed to load Core ML model from '%s'\n", __func__, path_coreml.c_str());
+-#ifndef WHISPER_COREML_ALLOW_FALLBACK
+         whisper_free_state(state);
+         return nullptr;
+-#endif
+     } else {
+         WHISPER_LOG_INFO("%s: Core ML model loaded\n", __func__);
++    }
++    }
++#else
++    if (ctx->params.coreml_compute_units != 0) {
++        whisper_free_state(state);
++        return nullptr;
+     }
+ #endif
+ 
+@@ -3617,6 +3636,9 @@
+             /*.heads            =*/ NULL,
+         },
+         /*.dtw_mem_size         =*/ 1024*1024*128,
++        /*.coreml_compute_units =*/ 0,
++        /*.coreml_model_path    =*/ nullptr,
++        /*.reuse_encoder        =*/ false,
+     };
+     return result;
+ }
+@@ -3873,6 +3895,7 @@
+ }
+ 
+ int whisper_pcm_to_mel_with_state(struct whisper_context * ctx, struct whisper_state * state, const float * samples, int n_samples, int n_threads) {
++    state->encoder_reusable = false; // Every new PCM input invalidates cached cross attention.
+     if (!log_mel_spectrogram(*state, samples, n_samples, WHISPER_SAMPLE_RATE, WHISPER_N_FFT, WHISPER_HOP_LENGTH, ctx->model.filters.n_mel, n_threads, ctx->model.filters, false, state->mel)) {
+         WHISPER_LOG_ERROR("%s: failed to compute mel spectrogram\n", __func__);
+         return -1;
+@@ -3891,6 +3914,7 @@
+                    const float * data,
+                            int   n_len,
+                            int   n_mel) {
++    state->encoder_reusable = false;
+     if (n_mel != ctx->model.filters.n_mel) {
+         WHISPER_LOG_ERROR("%s: invalid number of mel bands: %d (expected %d)\n", __func__, n_mel, ctx->model.filters.n_mel);
+         return -1;
+@@ -7109,6 +7133,9 @@
+                 }
+ 
+                 // init new transcription with sot, language (opt) and task tokens
++                // The SOT row follows any carried text context. Its unfiltered
++                // logits predict no-speech; the last row predicts the next token.
++                const int sot_index = prompt.size();
+                 prompt.insert(prompt.end(), prompt_init.begin(), prompt_init.end());
+ 
+                 // print the prompt
+@@ -7142,6 +7169,7 @@
+                 whisper_kv_cache_clear(state->kv_self);
+ 
+                 whisper_batch_prep_legacy(state->batch, prompt.data(), prompt.size(), 0, 0);
++                state->batch.logits[sot_index] = 1;
+ 
+                 if (!whisper_decode_internal(*ctx, *state, state->batch, params.n_threads, false, params.abort_callback, params.abort_callback_user_data)) {
+                     WHISPER_LOG_ERROR("%s: failed to decode\n", __func__);
+@@ -7155,8 +7183,10 @@
+                     std::vector<float> logprobs(n_logits);
+                     std::vector<float> probs(n_logits);
+ 
+-                    whisper_compute_logprobs(state->logits, n_logits, logprobs);
+-                    whisper_compute_probs(state->logits, n_logits, logprobs, probs);
++                    const auto sot_begin = state->logits.begin() + sot_index*n_logits;
++                    const std::vector<float> sot_logits(sot_begin, sot_begin + n_logits);
++                    whisper_compute_logprobs(sot_logits, n_logits, logprobs);
++                    whisper_compute_probs(sot_logits, n_logits, logprobs, probs);
+                     state->no_speech_prob = probs[whisper_token_nosp(ctx)];
+                 }
+ 

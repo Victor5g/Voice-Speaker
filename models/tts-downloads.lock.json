@@ -1,0 +1,50 @@
+[
+  {
+    "voice": "pt_BR-faber-medium",
+    "filename": "vits-piper-pt_BR-faber-medium.tar.bz2",
+    "source": "https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/vits-piper-pt_BR-faber-medium.tar.bz2",
+    "assetId": 482933227,
+    "sha256": "7add3f923ad6bc25ca8a192805fd1a64d1b3893e4611c4a9719545a825039a83",
+    "expectedSize": 67183065
+  },
+  {
+    "voice": "pt_BR-jeff-medium",
+    "filename": "vits-piper-pt_BR-jeff-medium.tar.bz2",
+    "source": "https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/vits-piper-pt_BR-jeff-medium.tar.bz2",
+    "assetId": 482932609,
+    "sha256": "da4c870fc7b20600c74261b3e1dd1c816da2ce063e18c46e1f2cd86dea88f3f0",
+    "expectedSize": 67207052
+  },
+  {
+    "voice": "pt_BR-edresson-low",
+    "filename": "vits-piper-pt_BR-edresson-low.tar.bz2",
+    "source": "https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/vits-piper-pt_BR-edresson-low.tar.bz2",
+    "assetId": 482933979,
+    "sha256": "670569e755cc48cda0a2f6a3ccba0698815566297069961edcd5f7daaf3d47a5",
+    "expectedSize": 67081775
+  },
+  {
+    "voice": "en_US-lessac-medium",
+    "filename": "vits-piper-en_US-lessac-medium.tar.bz2",
+    "source": "https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/vits-piper-en_US-lessac-medium.tar.bz2",
+    "assetId": 323261600,
+    "sha256": "9e3febfacf0abf4270172d2958bcec246032b7e88efc2720840cc80c93de334e",
+    "expectedSize": 67230653
+  },
+  {
+    "voice": "en_US-ryan-medium",
+    "filename": "vits-piper-en_US-ryan-medium.tar.bz2",
+    "source": "https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/vits-piper-en_US-ryan-medium.tar.bz2",
+    "assetId": 323261589,
+    "sha256": "c546af78b6395b4e7c4ce1ed899438b64426a362f5d4ec5fecd090ded9ad7505",
+    "expectedSize": 67213100
+  },
+  {
+    "voice": "en_US-amy-medium",
+    "filename": "vits-piper-en_US-amy-medium.tar.bz2",
+    "source": "https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/vits-piper-en_US-amy-medium.tar.bz2",
+    "assetId": 402197894,
+    "sha256": "9a5d1fc497f85e8022b785bff5f8105203b1e33099ee6265203efc70b0cb0264",
+    "expectedSize": 67223746
+  }
+]

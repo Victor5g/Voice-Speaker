@@ -1,0 +1,20 @@
+[
+  {
+    "filename": "cache/fleurs-pt_br.tsv",
+    "source": "https://huggingface.co/datasets/google/fleurs/resolve/70bb2e84b976b7e960aa89f1c648e09c59f894dd/data/pt_br/test.tsv",
+    "sha256": "4a7b8ae8ce07c355dcd2cf087a6486c7c3ab931d751b9a9218a9ee0cd798964b",
+    "expectedSize": 563257
+  },
+  {
+    "filename": "cache/fleurs-en_us.tsv",
+    "source": "https://huggingface.co/datasets/google/fleurs/resolve/70bb2e84b976b7e960aa89f1c648e09c59f894dd/data/en_us/test.tsv",
+    "sha256": "74c046239374deeb60fa63f258f907388093a32bcaa3140965f70ef05c79f7ca",
+    "expectedSize": 367864
+  },
+  {
+    "filename": "cache/fleurs-card.md",
+    "source": "https://huggingface.co/datasets/google/fleurs/resolve/70bb2e84b976b7e960aa89f1c648e09c59f894dd/README.md",
+    "sha256": "688f79f2a5c731af3796e9f683eb02f9b3f09d040decd8c5625d0f37098e71c6",
+    "expectedSize": 385614
+  }
+]

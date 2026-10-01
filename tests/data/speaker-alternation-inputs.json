@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "sourceType": "synthetic-development",
+  "scope": "Alternation of two generated voice sources; no human speaker identity or acoustic quality acceptance.",
+  "recordings": [
+    {
+      "filename": "tests/data/generated/ptbr.wav",
+      "sha256": "c4699cc1069d0d1d69d71d27d44586f8373b92222d1315b185bbb2a43903b6ce",
+      "speakerReference": "synthetic-ptbr",
+      "speakerReferenceVerified": true,
+      "referenceBasis": "Separate named macOS synthetic voices in scripts/generate-speech-fixtures.sh; not human identity",
+      "voice": "Luciana"
+    },
+    {
+      "filename": "tests/data/generated/enus.wav",
+      "sha256": "6a8260de676500d12c02fb22e594b479457f7ed899ce91fae59adbfacd3f7704",
+      "speakerReference": "synthetic-enus",
+      "speakerReferenceVerified": true,
+      "referenceBasis": "Separate named macOS synthetic voices in scripts/generate-speech-fixtures.sh; not human identity",
+      "voice": "Samantha"
+    }
+  ]
+}

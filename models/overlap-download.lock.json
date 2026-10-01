@@ -1,0 +1,7 @@
+{
+  "filename": "sherpa-onnx-pyannote-segmentation-3-0.tar.bz2",
+  "source": "https://github.com/k2-fsa/sherpa-onnx/releases/download/speaker-segmentation-models/sherpa-onnx-pyannote-segmentation-3-0.tar.bz2",
+  "assetId": 197666131,
+  "expectedSize": 6958444,
+  "sha256": "24615ee884c897d9d2ba09bb4d30da6bb1b15e685065962db5b02e76e4996488"
+}

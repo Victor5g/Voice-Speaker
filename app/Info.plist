@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+<key>CFBundleName</key><string>LocalVoiceTranslator</string>
+<key>CFBundleDisplayName</key><string>LocalVoiceTranslator</string>
+<key>CFBundleExecutable</key><string>$(EXECUTABLE_NAME)</string>
+<key>CFBundleIdentifier</key><string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+<key>CFBundlePackageType</key><string>APPL</string>
+<key>CFBundleShortVersionString</key><string>0.2.1</string>
+<key>CFBundleVersion</key><string>2</string>
+<key>LSMinimumSystemVersion</key><string>$(MACOSX_DEPLOYMENT_TARGET)</string>
+<key>NSMicrophoneUsageDescription</key><string>Reconhecer e traduzir as falas localmente, sem gravar a conversa. No modo Chamada, a voz traduzida é entregue ao aplicativo de chamada escolhido.</string>
+<key>NSAudioCaptureUsageDescription</key><string>Receber o áudio enviado ao dispositivo LocalVoiceTranslator Speakers e encaminhar sua tradução ao microfone virtual da chamada. O processamento é local e não grava a conversa.</string>
+<key>NSPrincipalClass</key><string>NSApplication</string>
+<key>NSHighResolutionCapable</key><true/>
+<key>NSQuitAlwaysKeepsWindows</key><false/>
+</dict></plist>

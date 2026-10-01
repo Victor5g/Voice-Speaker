@@ -1,0 +1,9 @@
+{
+  "pt-en": "int8",
+  "en-pt": "int8",
+  "status": "CPU INT8 selected for the complete Balanced pipeline; FP32 uses more memory without a semantic gain in the 16 authored cases. Physical/offline acceptance remains pending.",
+  "evidence": "artifacts/translation-{direction}-{precision}.jsonl",
+  "samplesPerDirectionPerPrecision": 8,
+  "semanticLimitation": "PT-EN may anglicize proper names (Jo\u00e3o -> John); not a guaranteed name-preserving translator.",
+  "fullFP32Configuration": "Measured: native translation completed but TTS admission was denied by the conservative 8 GiB budget; artifacts/profile-float32.jsonl."
+}

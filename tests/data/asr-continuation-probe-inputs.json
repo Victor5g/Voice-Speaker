@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "status": "pending-exact-ASR-start-frames",
+  "source": "artifacts/latency-policy/human-comma-boundary-20260927/pt-control.jsonl",
+  "coordinateSystem": "16 kHz frames relative to fixture; end exclusive",
+  "limitation": "The original event trace records capture origin and window end, but not ASR unit firstFrame. No runnable exact interval is asserted. Obtain the actual unit bounds from instrumented production replay before using this descriptor for exact-crop comparisons. Direct WAV slices may also differ from pipeline resampling.",
+  "cases": [
+    {
+      "fixture": "tests/data/latency-human/development/pt_br-5779886153857809927.wav",
+      "sha256": "d65bbdb5618860879bcbe03363fcd1de8510a221df41d186c6463bf4ae6070dc",
+      "sourceSegment": 248,
+      "captureFirstFrame": 3951360,
+      "observedAbsoluteWindowEndFrame": 4064320,
+      "firstFrame": null,
+      "observedRelativeEndFrameExclusive": 112960,
+      "filteredText": "and great Yarmouth.",
+      "expectation": "Retain genuine location continuation without replaying prior phrase; reference must not be an ASR prompt."
+    },
+    {
+      "fixture": "tests/data/latency-human/development/pt_br-15365693344391469533.wav",
+      "sourceSegment": 360,
+      "captureFirstFrame": 5902720,
+      "observedAbsoluteWindowEndFrame": 6046720,
+      "firstFrame": null,
+      "observedRelativeEndFrameExclusive": 144000,
+      "fixtureFrames": 138240,
+      "endBeyondFixture": true,
+      "filteredText": "Thank you.",
+      "expectation": "Do not create an extra spoken unit absent from the reference. Exact captured PCM includes harness tail beyond the WAV and must be obtained from replay rather than silently clamped or padded by the probe."
+    }
+  ]
+}

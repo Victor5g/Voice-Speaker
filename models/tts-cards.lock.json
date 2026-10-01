@@ -1,0 +1,32 @@
+[
+  {
+    "filename": "optional/tts/vits-piper-pt_BR-faber-medium/UPSTREAM_MODEL_CARD.txt",
+    "sha256": "01f1a5bcfd0538782726059ae407eae9c2dd1b5b35f7298fd53a68de91afe563",
+    "expectedSize": 279
+  },
+  {
+    "filename": "optional/tts/vits-piper-pt_BR-jeff-medium/UPSTREAM_MODEL_CARD.txt",
+    "sha256": "acdea1b233a478a8ce3bac1f4886a14c8bb6a6287cefb41a26a657a3a7418b08",
+    "expectedSize": 278
+  },
+  {
+    "filename": "optional/tts/vits-piper-pt_BR-edresson-low/UPSTREAM_MODEL_CARD.txt",
+    "sha256": "d8fb0dab2d61ad9796904836fb2fc0ac7e324d89e80bc9ef14e328b77e5cb66f",
+    "expectedSize": 283
+  },
+  {
+    "filename": "optional/tts/vits-piper-en_US-lessac-medium/UPSTREAM_MODEL_CARD.txt",
+    "sha256": "ce49eb457742208166d399a40cdec2c7fa9db77960930031564ab56f12882645",
+    "expectedSize": 351
+  },
+  {
+    "filename": "optional/tts/vits-piper-en_US-ryan-medium/UPSTREAM_MODEL_CARD.txt",
+    "sha256": "3a24ae5f7aa856199f338ad9af784cda796734f397f7e1b4a1bd3c07d06945b1",
+    "expectedSize": 306
+  },
+  {
+    "filename": "optional/tts/vits-piper-en_US-amy-medium/UPSTREAM_MODEL_CARD.txt",
+    "sha256": "858419ea604c427ff2e9918556345667eb46397da3c965de75f4f7f0bb50a962",
+    "expectedSize": 284
+  }
+]

@@ -1,0 +1,143 @@
+{
+  "kind": "Synthetic regression PCM from real native echo tests; float32 LE mono 2 kHz after averaging; no human recording",
+  "origin": "Portuguese macOS synthetic fixture plus actually played Piper Lessac translation, 60 ms digital echo, Conv-TasNet separation",
+  "models": "models/manifest.json; en_US-lessac-medium and convtasnet_16k",
+  "purpose": "Clipped playback sources must be removed; microphone mixture and separated Portuguese person must remain",
+  "cases": [
+    {
+      "id": "1-microphone",
+      "expected": false,
+      "separated": false,
+      "source": {
+        "filename": "tests/data/echo-regression/1-microphone-source.f32",
+        "sha256": "34d686dbb849c333769f9efe5bde61862aa7aefe3f75d228bf89607dc1bac8d9",
+        "expectedSize": 24000
+      },
+      "reference": {
+        "filename": "tests/data/echo-regression/1-microphone-reference.f32",
+        "sha256": "db02d218a54c18359d8686eb6db7bf58bf55062050991edc2425ecb19946380e",
+        "expectedSize": 72640
+      }
+    },
+    {
+      "id": "1-playback",
+      "expected": true,
+      "separated": true,
+      "source": {
+        "filename": "tests/data/echo-regression/1-playback-source.f32",
+        "sha256": "3b7635d5f52e164caf8b3fb194c35b36252715ee01104047fecb684272ed028b",
+        "expectedSize": 25760
+      },
+      "reference": {
+        "filename": "tests/data/echo-regression/1-playback-reference.f32",
+        "sha256": "0feb0aed65d02ffb04057487599012d8533aca89c86b04e84275b823a35e90c4",
+        "expectedSize": 79520
+      }
+    },
+    {
+      "id": "1-person",
+      "expected": false,
+      "separated": true,
+      "source": {
+        "filename": "tests/data/echo-regression/1-person-source.f32",
+        "sha256": "f8d9684c5e7970442a789b304a12ea2d2f5496348b54229a0092bc2f3413a313",
+        "expectedSize": 25760
+      },
+      "reference": {
+        "filename": "tests/data/echo-regression/1-person-reference.f32",
+        "sha256": "fb687397241ce71ee0be480c078ba5ee32392664871e76f6f19bb1430130fac7",
+        "expectedSize": 79680
+      }
+    },
+    {
+      "id": "2-microphone",
+      "expected": false,
+      "separated": false,
+      "source": {
+        "filename": "tests/data/echo-regression/2-microphone-source.f32",
+        "sha256": "a5a9530075c9a02d0be02611359c3185725879971816b64001c08858c9019ee5",
+        "expectedSize": 24000
+      },
+      "reference": {
+        "filename": "tests/data/echo-regression/2-microphone-reference.f32",
+        "sha256": "74b56eed613b970236024c99548de10ffa34bcb721ecf1c912f643648eba63fa",
+        "expectedSize": 72640
+      }
+    },
+    {
+      "id": "2-playback",
+      "expected": true,
+      "separated": true,
+      "source": {
+        "filename": "tests/data/echo-regression/2-playback-source.f32",
+        "sha256": "4b61ef86f6db4f55bf2491418f0031a765a21d33b2ec18fd3bfd78dc2129c71b",
+        "expectedSize": 25600
+      },
+      "reference": {
+        "filename": "tests/data/echo-regression/2-playback-reference.f32",
+        "sha256": "afba4d154b32988549b9e925180cf5d9b7ec256e33d7fdf66894bf973b13822a",
+        "expectedSize": 79680
+      }
+    },
+    {
+      "id": "2-person",
+      "expected": false,
+      "separated": true,
+      "source": {
+        "filename": "tests/data/echo-regression/2-person-source.f32",
+        "sha256": "061437722fbf439ad75ab3e6013515fe85cc308b4b1fd359eb7919bf3067f6cd",
+        "expectedSize": 25600
+      },
+      "reference": {
+        "filename": "tests/data/echo-regression/2-person-reference.f32",
+        "sha256": "d508015a5b7545e18828c12d2afbeaa7c9fd8bfc5eecce75a57ad88d5bece177",
+        "expectedSize": 79840
+      }
+    },
+    {
+      "id": "3-microphone",
+      "expected": false,
+      "separated": false,
+      "source": {
+        "filename": "tests/data/echo-regression/3-microphone-source.f32",
+        "sha256": "76479c87413f2b45b31319e1646a0b2416fa21d4d8ec14bce375e7f1249d4d9a",
+        "expectedSize": 24000
+      },
+      "reference": {
+        "filename": "tests/data/echo-regression/3-microphone-reference.f32",
+        "sha256": "175b0cf8745fea856c9d472bd402a7836cdb18c324b821e931517f9dafe33623",
+        "expectedSize": 72640
+      }
+    },
+    {
+      "id": "3-playback",
+      "expected": true,
+      "separated": true,
+      "source": {
+        "filename": "tests/data/echo-regression/3-playback-source.f32",
+        "sha256": "f59344796838f2dbafecb5bbe5a3ba87f404cb4e35c12a0367d9e9430f0764d8",
+        "expectedSize": 25600
+      },
+      "reference": {
+        "filename": "tests/data/echo-regression/3-playback-reference.f32",
+        "sha256": "654b3b079c86553e402141fb56a675c5a86b3806073d2bb53b26e82ac3307907",
+        "expectedSize": 78720
+      }
+    },
+    {
+      "id": "3-person",
+      "expected": false,
+      "separated": true,
+      "source": {
+        "filename": "tests/data/echo-regression/3-person-source.f32",
+        "sha256": "bf480ed7b6ac790d610bf9dee3c0fa71d9fecfa9e39ee23833e32ebe9b5c7390",
+        "expectedSize": 25600
+      },
+      "reference": {
+        "filename": "tests/data/echo-regression/3-person-reference.f32",
+        "sha256": "0e4830b6a6412949e9d124964adc83bb07dcd38130bfadbe0cbfa9303d04b954",
+        "expectedSize": 78880
+      }
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "type": "synthetic development fixtures; no human quality claim",
+  "seed": 914,
+  "fixtures": {
+    "three-speakers-return": {
+      "filename": "tests/data/scenarios/three-speakers-return.wav",
+      "sha256": "46c56ece740d8789b00c44684754da572b5d1c852d81e9f5f728c8ccbd639b67",
+      "expectedSize": 1326598
+    },
+    "english-accents": {
+      "filename": "tests/data/scenarios/english-accents.wav",
+      "sha256": "8f09fac949d72b40904f8b83991a73c64575b89fffe7ea839b604dbf1515ef06",
+      "expectedSize": 501338
+    },
+    "overlap-two-english": {
+      "filename": "tests/data/scenarios/overlap-two-english.wav",
+      "sha256": "53aa20e554919cfffaaf389eac237f435931158fc8acf49333fc2ce13883a5ad",
+      "expectedSize": 256044
+    },
+    "silence": {
+      "filename": "tests/data/scenarios/silence.wav",
+      "sha256": "ee7bea4232762775f8fce9b3e27e4d3948c8ac6a45a87ca769f703d6eed0b448",
+      "expectedSize": 320044
+    },
+    "noise-only": {
+      "filename": "tests/data/scenarios/noise-only.wav",
+      "sha256": "70c67dbbc0d250269e9217dc4ac025c76e0d92f9d7f08382bf1b438c4371b500",
+      "expectedSize": 320044
+    },
+    "speech-noise": {
+      "filename": "tests/data/scenarios/speech-noise.wav",
+      "sha256": "6b44cac08ab7aac7514b751fd2048b11a321becd89d920fe59852c1dc04db8f4",
+      "expectedSize": 609348
+    },
+    "instrumental-tone": {
+      "filename": "tests/data/scenarios/instrumental-tone.wav",
+      "sha256": "f805947742e5561b21ade5a6886f4af6f15ae8bfc9f3ea4ad80e5fdc3306b40f",
+      "expectedSize": 320044
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "candidates": [
+    {
+      "id": "large-v3-turbo-q5_0",
+      "model": {
+        "name": "Whisper large-v3-turbo Q5_0",
+        "type": "asr",
+        "version": "5359861c739e955e79d9a303bcbc70fb988958b1",
+        "filename": "optional/ggml-large-v3-turbo-q5_0.bin",
+        "sha256": "394221709cd5ad1f40c46e6031ca61bce88931e6e088c188294c6d5a55ffa7e2",
+        "license": "MIT",
+        "source": "https://huggingface.co/ggerganov/whisper.cpp/resolve/5359861c739e955e79d9a303bcbc70fb988958b1/ggml-large-v3-turbo-q5_0.bin",
+        "expectedSize": 574041195,
+        "backend": "whisper.cpp 1.8.3 / Metal",
+        "quantization": "Q5_0",
+        "tokenizer": "Vocabulary embedded in GGML model",
+        "modelCard": "https://huggingface.co/openai/whisper-large-v3-turbo",
+        "status": "Development candidate; not selected or quality/latency approved"
+      }
+    }
+  ]
+}

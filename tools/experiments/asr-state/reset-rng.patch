@@ -1,0 +1,10 @@
+--- whisper.cpp
++++ whisper.cpp
+@@ -6904,6 +6904,7 @@
+         return -4;
+     }
+ 
++    state->decoders[0].rng = std::mt19937(0); // Isolate independent transcriptions.
+     // TAGS: WHISPER_DECODER_INIT
+     for (int j = 1; j < n_decoders; j++) {
+         auto & decoder = state->decoders[j];

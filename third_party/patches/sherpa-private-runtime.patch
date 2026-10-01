@@ -1,0 +1,1291 @@
+diff --git a/scripts/go/_internal/vad-spoken-language-identification/main.go b/scripts/go/_internal/vad-spoken-language-identification/main.go
+index f831629..327f0e2 120000
+--- a/scripts/go/_internal/vad-spoken-language-identification/main.go
++++ b/scripts/go/_internal/vad-spoken-language-identification/main.go
+@@ -1 +1 @@
+-/Users/fangjun/open-source/sherpa-onnx/go-api-examples/vad-spoken-language-identification/main.go
+\ No newline at end of file
++../../../../go-api-examples/vad-spoken-language-identification/main.go
+\ No newline at end of file
+diff --git a/scripts/go/_internal/vad-spoken-language-identification/run.sh b/scripts/go/_internal/vad-spoken-language-identification/run.sh
+index 9e71cc9..fb400fa 120000
+--- a/scripts/go/_internal/vad-spoken-language-identification/run.sh
++++ b/scripts/go/_internal/vad-spoken-language-identification/run.sh
+@@ -1 +1 @@
+-/Users/fangjun/open-source/sherpa-onnx/go-api-examples/vad-spoken-language-identification/run.sh
+\ No newline at end of file
++../../../../go-api-examples/vad-spoken-language-identification/run.sh
+\ No newline at end of file
+diff --git a/sherpa-onnx/csrc/hifigan-vocoder.cc b/sherpa-onnx/csrc/hifigan-vocoder.cc
+index a990bdd..f19042e 100644
+--- a/sherpa-onnx/csrc/hifigan-vocoder.cc
++++ b/sherpa-onnx/csrc/hifigan-vocoder.cc
+@@ -1,3 +1,4 @@
++#include "sherpa-onnx/csrc/private-ort-env.h"
+ // sherpa-onnx/csrc/hifigan-vocoder.cc
+ //
+ // Copyright (c)  2024  Xiaomi Corporation
+@@ -83,7 +84,7 @@ class HifiganVocoder::Impl {
+   }
+ 
+  private:
+-  Ort::Env env_;
++  PrivateOrtEnv env_;
+   Ort::SessionOptions sess_opts_;
+   Ort::AllocatorWithDefaultOptions allocator_;
+ 
+diff --git a/sherpa-onnx/csrc/macros.h b/sherpa-onnx/csrc/macros.h
+index d68c4c1..ea5cd00 100644
+--- a/sherpa-onnx/csrc/macros.h
++++ b/sherpa-onnx/csrc/macros.h
+@@ -58,6 +58,16 @@
+     _Exit(code);               \
+   } while (0)
+ 
++// LocalVoiceTranslator: backend diagnostics must never persist conversation text.
++// Native callers catch these failures and expose a content-free UI error.
++#ifdef LVT_PRIVATE_RUNTIME
++#include <stdexcept>
++#undef SHERPA_ONNX_LOGE
++#define SHERPA_ONNX_LOGE(...) do {} while (0)
++#undef SHERPA_ONNX_EXIT
++#define SHERPA_ONNX_EXIT(code) throw std::runtime_error("Speech backend rejected model or inference")
++#endif
++
+ // Read an integer
+ #define SHERPA_ONNX_READ_META_DATA(dst, src_key)                           \
+   do {                                                                     \
+diff --git a/sherpa-onnx/csrc/offline-canary-model.cc b/sherpa-onnx/csrc/offline-canary-model.cc
+index 3e5d40f..95769a8 100644
+--- a/sherpa-onnx/csrc/offline-canary-model.cc
++++ b/sherpa-onnx/csrc/offline-canary-model.cc
+@@ -1,3 +1,4 @@
++#include "sherpa-onnx/csrc/private-ort-env.h"
+ // sherpa-onnx/csrc/offline-canary-model.cc
+ //
+ // Copyright (c)  2025  Xiaomi Corporation
+@@ -213,7 +214,7 @@ class OfflineCanaryModel::Impl {
+  private:
+   OfflineCanaryModelMetaData meta_;
+   OfflineModelConfig config_;
+-  Ort::Env env_;
++  PrivateOrtEnv env_;
+   Ort::SessionOptions sess_opts_;
+   Ort::AllocatorWithDefaultOptions allocator_;
+ 
+diff --git a/sherpa-onnx/csrc/offline-catt-model.cc b/sherpa-onnx/csrc/offline-catt-model.cc
+index f53eb3d..34c4d2a 100644
+--- a/sherpa-onnx/csrc/offline-catt-model.cc
++++ b/sherpa-onnx/csrc/offline-catt-model.cc
+@@ -1,3 +1,4 @@
++#include "sherpa-onnx/csrc/private-ort-env.h"
+ // sherpa-onnx/csrc/offline-catt-model.cc
+ //
+ // Copyright (c)  2026  Matias Lin
+@@ -113,7 +114,7 @@ class OfflineCATTModel::Impl {
+   }
+ 
+   OfflineDiacritizationModelConfig config_;
+-  Ort::Env env_;
++  PrivateOrtEnv env_;
+   Ort::SessionOptions sess_opts_;
+   Ort::AllocatorWithDefaultOptions allocator_;
+ 
+diff --git a/sherpa-onnx/csrc/offline-ced-model.cc b/sherpa-onnx/csrc/offline-ced-model.cc
+index 7197f13..225ada4 100644
+--- a/sherpa-onnx/csrc/offline-ced-model.cc
++++ b/sherpa-onnx/csrc/offline-ced-model.cc
+@@ -1,3 +1,4 @@
++#include "sherpa-onnx/csrc/private-ort-env.h"
+ // sherpa-onnx/csrc/offline-ced-model.cc
+ //
+ // Copyright (c)  2024  Xiaomi Corporation
+@@ -85,7 +86,7 @@ class OfflineCEDModel::Impl {
+ 
+  private:
+   AudioTaggingModelConfig config_;
+-  Ort::Env env_;
++  PrivateOrtEnv env_;
+   Ort::SessionOptions sess_opts_;
+   Ort::AllocatorWithDefaultOptions allocator_;
+ 
+diff --git a/sherpa-onnx/csrc/offline-cohere-transcribe-model.cc b/sherpa-onnx/csrc/offline-cohere-transcribe-model.cc
+index 751e574..026fae5 100644
+--- a/sherpa-onnx/csrc/offline-cohere-transcribe-model.cc
++++ b/sherpa-onnx/csrc/offline-cohere-transcribe-model.cc
+@@ -1,3 +1,4 @@
++#include "sherpa-onnx/csrc/private-ort-env.h"
+ // sherpa-onnx/csrc/offline-cohere-transcribe-model.cc
+ //
+ // Copyright (c)  2026  Xiaomi Corporation
+@@ -295,7 +296,7 @@ class OfflineCohereTranscribeModel::Impl {
+   }
+ 
+   OfflineModelConfig config_;
+-  Ort::Env env_;
++  PrivateOrtEnv env_;
+   Ort::SessionOptions sess_opts_;
+   Ort::AllocatorWithDefaultOptions allocator_;
+ 
+diff --git a/sherpa-onnx/csrc/offline-ct-transformer-model.cc b/sherpa-onnx/csrc/offline-ct-transformer-model.cc
+index 3d12d9f..965a5d0 100644
+--- a/sherpa-onnx/csrc/offline-ct-transformer-model.cc
++++ b/sherpa-onnx/csrc/offline-ct-transformer-model.cc
+@@ -1,3 +1,4 @@
++#include "sherpa-onnx/csrc/private-ort-env.h"
+ // sherpa-onnx/csrc/offline-ct-transformer-model.cc
+ //
+ // Copyright (c)  2024  Xiaomi Corporation
+@@ -140,7 +141,7 @@ class OfflineCtTransformerModel::Impl {
+ 
+  private:
+   OfflinePunctuationModelConfig config_;
+-  Ort::Env env_;
++  PrivateOrtEnv env_;
+   Ort::SessionOptions sess_opts_;
+   Ort::AllocatorWithDefaultOptions allocator_;
+ 
+diff --git a/sherpa-onnx/csrc/offline-ctc-model.cc b/sherpa-onnx/csrc/offline-ctc-model.cc
+index d7a25a9..8a2033c 100644
+--- a/sherpa-onnx/csrc/offline-ctc-model.cc
++++ b/sherpa-onnx/csrc/offline-ctc-model.cc
+@@ -1,3 +1,4 @@
++#include "sherpa-onnx/csrc/private-ort-env.h"
+ // sherpa-onnx/csrc/offline-ctc-model.cc
+ //
+ // Copyright (c)  2022-2023  Xiaomi Corporation
+@@ -51,7 +52,7 @@ enum class ModelType : std::uint8_t {
+ namespace sherpa_onnx {
+ 
+ static ModelType GetModelType(const std::string &model_path, bool debug) {
+-  Ort::Env env = ORT_LOGGING_LEVEL_ERROR;
++  PrivateOrtEnv env = ORT_LOGGING_LEVEL_ERROR;
+   Ort::SessionOptions sess_opts;
+   sess_opts.SetIntraOpNumThreads(1);
+   sess_opts.SetInterOpNumThreads(1);
+@@ -115,7 +116,7 @@ static ModelType GetModelType(const std::string &model_path, bool debug) {
+ 
+ static ModelType GetModelType(char *model_data, size_t model_data_length,
+                               bool debug) {
+-  Ort::Env env = ORT_LOGGING_LEVEL_ERROR;
++  PrivateOrtEnv env = ORT_LOGGING_LEVEL_ERROR;
+   Ort::SessionOptions sess_opts;
+   sess_opts.SetIntraOpNumThreads(1);
+   sess_opts.SetInterOpNumThreads(1);
+diff --git a/sherpa-onnx/csrc/offline-dolphin-model.cc b/sherpa-onnx/csrc/offline-dolphin-model.cc
+index 8cc99be..e9d010f 100644
+--- a/sherpa-onnx/csrc/offline-dolphin-model.cc
++++ b/sherpa-onnx/csrc/offline-dolphin-model.cc
+@@ -1,3 +1,4 @@
++#include "sherpa-onnx/csrc/private-ort-env.h"
+ // sherpa-onnx/csrc/offline-dolphin-model.cc
+ //
+ // Copyright (c)  2025  Xiaomi Corporation
+@@ -117,7 +118,7 @@ class OfflineDolphinModel::Impl {
+ 
+  private:
+   OfflineModelConfig config_;
+-  Ort::Env env_;
++  PrivateOrtEnv env_;
+   Ort::SessionOptions sess_opts_;
+   Ort::AllocatorWithDefaultOptions allocator_;
+ 
+diff --git a/sherpa-onnx/csrc/offline-fire-red-asr-ctc-model.cc b/sherpa-onnx/csrc/offline-fire-red-asr-ctc-model.cc
+index f11f02f..b759f34 100644
+--- a/sherpa-onnx/csrc/offline-fire-red-asr-ctc-model.cc
++++ b/sherpa-onnx/csrc/offline-fire-red-asr-ctc-model.cc
+@@ -1,3 +1,4 @@
++#include "sherpa-onnx/csrc/private-ort-env.h"
+ // sherpa-onnx/csrc/offline-fire-red-asr-ctc-model.cc
+ //
+ // Copyright (c)  2026  Xiaomi Corporation
+@@ -152,7 +153,7 @@ class OfflineFireRedAsrCtcModel::Impl {
+ 
+  private:
+   OfflineModelConfig config_;
+-  Ort::Env env_;
++  PrivateOrtEnv env_;
+   Ort::SessionOptions sess_opts_;
+   Ort::AllocatorWithDefaultOptions allocator_;
+ 
+diff --git a/sherpa-onnx/csrc/offline-fire-red-asr-model.cc b/sherpa-onnx/csrc/offline-fire-red-asr-model.cc
+index 556fd0f..da395e8 100644
+--- a/sherpa-onnx/csrc/offline-fire-red-asr-model.cc
++++ b/sherpa-onnx/csrc/offline-fire-red-asr-model.cc
+@@ -1,3 +1,4 @@
++#include "sherpa-onnx/csrc/private-ort-env.h"
+ // sherpa-onnx/csrc/offline-fire-red-asr-model.cc
+ //
+ // Copyright (c)  2025  Xiaomi Corporation
+@@ -284,7 +285,7 @@ class OfflineFireRedAsrModel::Impl {
+ 
+  private:
+   OfflineModelConfig config_;
+-  Ort::Env env_;
++  PrivateOrtEnv env_;
+   Ort::SessionOptions sess_opts_;
+   Ort::AllocatorWithDefaultOptions allocator_;
+ 
+diff --git a/sherpa-onnx/csrc/offline-funasr-nano-model.cc b/sherpa-onnx/csrc/offline-funasr-nano-model.cc
+index 2eabecc..8a48a0b 100644
+--- a/sherpa-onnx/csrc/offline-funasr-nano-model.cc
++++ b/sherpa-onnx/csrc/offline-funasr-nano-model.cc
+@@ -1,3 +1,4 @@
++#include "sherpa-onnx/csrc/private-ort-env.h"
+ // sherpa-onnx/csrc/offline-funasr-nano-model.cc
+ //
+ // Copyright (c)  2025  zengyw
+@@ -1159,7 +1160,7 @@ class OfflineFunASRNanoModel::Impl {
+ 
+  private:
+   OfflineModelConfig config_;
+-  Ort::Env env_;
++  PrivateOrtEnv env_;
+   Ort::SessionOptions sess_opts_encoder_;
+   Ort::SessionOptions sess_opts_llm_;
+   Ort::SessionOptions sess_opts_embedding_;
+diff --git a/sherpa-onnx/csrc/offline-medasr-ctc-model.cc b/sherpa-onnx/csrc/offline-medasr-ctc-model.cc
+index a010196..35b9542 100644
+--- a/sherpa-onnx/csrc/offline-medasr-ctc-model.cc
++++ b/sherpa-onnx/csrc/offline-medasr-ctc-model.cc
+@@ -1,3 +1,4 @@
++#include "sherpa-onnx/csrc/private-ort-env.h"
+ // sherpa-onnx/csrc/offline-medasr-ctc-model.cc
+ //
+ // Copyright (c)  2025  Xiaomi Corporation
+@@ -152,7 +153,7 @@ class OfflineMedAsrCtcModel::Impl {
+ 
+  private:
+   OfflineModelConfig config_;
+-  Ort::Env env_;
++  PrivateOrtEnv env_;
+   Ort::SessionOptions sess_opts_;
+   Ort::AllocatorWithDefaultOptions allocator_;
+ 
+diff --git a/sherpa-onnx/csrc/offline-moonshine-model-v2.cc b/sherpa-onnx/csrc/offline-moonshine-model-v2.cc
+index b7cc3fb..45b805e 100644
+--- a/sherpa-onnx/csrc/offline-moonshine-model-v2.cc
++++ b/sherpa-onnx/csrc/offline-moonshine-model-v2.cc
+@@ -1,3 +1,4 @@
++#include "sherpa-onnx/csrc/private-ort-env.h"
+ // sherpa-onnx/csrc/offline-moonshine-model-v2.cc
+ //
+ // Copyright (c)  2024-2026  Xiaomi Corporation
+@@ -259,7 +260,7 @@ class OfflineMoonshineModelV2::Impl {
+ 
+  private:
+   OfflineModelConfig config_;
+-  Ort::Env env_;
++  PrivateOrtEnv env_;
+   Ort::SessionOptions sess_opts_;
+   Ort::AllocatorWithDefaultOptions allocator_;
+ 
+diff --git a/sherpa-onnx/csrc/offline-moonshine-model.cc b/sherpa-onnx/csrc/offline-moonshine-model.cc
+index 8266d0f..8bf2678 100644
+--- a/sherpa-onnx/csrc/offline-moonshine-model.cc
++++ b/sherpa-onnx/csrc/offline-moonshine-model.cc
+@@ -1,3 +1,4 @@
++#include "sherpa-onnx/csrc/private-ort-env.h"
+ // sherpa-onnx/csrc/offline-moonshine-model.cc
+ //
+ // Copyright (c)  2024  Xiaomi Corporation
+@@ -242,7 +243,7 @@ class OfflineMoonshineModel::Impl {
+ 
+  private:
+   OfflineModelConfig config_;
+-  Ort::Env env_;
++  PrivateOrtEnv env_;
+   Ort::SessionOptions sess_opts_;
+   Ort::AllocatorWithDefaultOptions allocator_;
+ 
+diff --git a/sherpa-onnx/csrc/offline-nemo-enc-dec-ctc-model.cc b/sherpa-onnx/csrc/offline-nemo-enc-dec-ctc-model.cc
+index 5578ba8..7d4a3c5 100644
+--- a/sherpa-onnx/csrc/offline-nemo-enc-dec-ctc-model.cc
++++ b/sherpa-onnx/csrc/offline-nemo-enc-dec-ctc-model.cc
+@@ -1,3 +1,4 @@
++#include "sherpa-onnx/csrc/private-ort-env.h"
+ // sherpa-onnx/csrc/offline-nemo-enc-dec-ctc-model.cc
+ //
+ // Copyright (c)  2023-2024  Xiaomi Corporation
+@@ -132,7 +133,7 @@ class OfflineNemoEncDecCtcModel::Impl {
+ 
+  private:
+   OfflineModelConfig config_;
+-  Ort::Env env_;
++  PrivateOrtEnv env_;
+   Ort::SessionOptions sess_opts_;
+   Ort::AllocatorWithDefaultOptions allocator_;
+ 
+diff --git a/sherpa-onnx/csrc/offline-omnilingual-asr-ctc-model.cc b/sherpa-onnx/csrc/offline-omnilingual-asr-ctc-model.cc
+index aa856b2..5af193e 100644
+--- a/sherpa-onnx/csrc/offline-omnilingual-asr-ctc-model.cc
++++ b/sherpa-onnx/csrc/offline-omnilingual-asr-ctc-model.cc
+@@ -1,3 +1,4 @@
++#include "sherpa-onnx/csrc/private-ort-env.h"
+ // sherpa-onnx/csrc/offline-omnilingual-asr-ctc-model.cc
+ //
+ // Copyright (c)  2025  Xiaomi Corporation
+@@ -137,7 +138,7 @@ class OfflineOmnilingualAsrCtcModel::Impl {
+ 
+  private:
+   OfflineModelConfig config_;
+-  Ort::Env env_;
++  PrivateOrtEnv env_;
+   Ort::SessionOptions sess_opts_;
+   Ort::AllocatorWithDefaultOptions allocator_;
+ 
+diff --git a/sherpa-onnx/csrc/offline-paraformer-model.cc b/sherpa-onnx/csrc/offline-paraformer-model.cc
+index 4c5bed3..bb338b9 100644
+--- a/sherpa-onnx/csrc/offline-paraformer-model.cc
++++ b/sherpa-onnx/csrc/offline-paraformer-model.cc
+@@ -1,3 +1,4 @@
++#include "sherpa-onnx/csrc/private-ort-env.h"
+ // sherpa-onnx/csrc/offline-paraformer-model.cc
+ //
+ // Copyright (c)  2022-2023  Xiaomi Corporation
+@@ -109,7 +110,7 @@ class OfflineParaformerModel::Impl {
+ 
+  private:
+   OfflineModelConfig config_;
+-  Ort::Env env_;
++  PrivateOrtEnv env_;
+   Ort::SessionOptions sess_opts_;
+   Ort::AllocatorWithDefaultOptions allocator_;
+ 
+diff --git a/sherpa-onnx/csrc/offline-qwen3-asr-model.cc b/sherpa-onnx/csrc/offline-qwen3-asr-model.cc
+index 689afaa..6672fa9 100644
+--- a/sherpa-onnx/csrc/offline-qwen3-asr-model.cc
++++ b/sherpa-onnx/csrc/offline-qwen3-asr-model.cc
+@@ -1,3 +1,4 @@
++#include "sherpa-onnx/csrc/private-ort-env.h"
+ // sherpa-onnx/csrc/offline-qwen3-asr-model.cc
+ //
+ // Copyright (c)  2026  zengyw
+@@ -754,7 +755,7 @@ class OfflineQwen3ASRModel::Impl {
+  private:
+   OfflineModelConfig config_;
+ 
+-  Ort::Env env_;
++  PrivateOrtEnv env_;
+   Ort::SessionOptions sess_opts_conv_;
+   Ort::SessionOptions sess_opts_encoder_;
+   Ort::SessionOptions sess_opts_decoder_;
+diff --git a/sherpa-onnx/csrc/offline-recognizer-impl.cc b/sherpa-onnx/csrc/offline-recognizer-impl.cc
+index 2f20588..25f7bca 100644
+--- a/sherpa-onnx/csrc/offline-recognizer-impl.cc
++++ b/sherpa-onnx/csrc/offline-recognizer-impl.cc
+@@ -1,3 +1,4 @@
++#include "sherpa-onnx/csrc/private-ort-env.h"
+ // sherpa-onnx/csrc/offline-recognizer-impl.cc
+ //
+ // Copyright (c)  2023  Xiaomi Corporation
+@@ -317,7 +318,7 @@ std::unique_ptr<OfflineRecognizerImpl> OfflineRecognizerImpl::Create(
+     }
+   }
+ 
+-  Ort::Env env = ORT_LOGGING_LEVEL_ERROR;
++  PrivateOrtEnv env = ORT_LOGGING_LEVEL_ERROR;
+ 
+   Ort::SessionOptions sess_opts;
+   sess_opts.SetIntraOpNumThreads(1);
+@@ -685,7 +686,7 @@ std::unique_ptr<OfflineRecognizerImpl> OfflineRecognizerImpl::Create(
+     }
+   }
+ 
+-  Ort::Env env = ORT_LOGGING_LEVEL_ERROR;
++  PrivateOrtEnv env = ORT_LOGGING_LEVEL_ERROR;
+ 
+   Ort::SessionOptions sess_opts;
+   sess_opts.SetIntraOpNumThreads(1);
+diff --git a/sherpa-onnx/csrc/offline-rnn-lm.cc b/sherpa-onnx/csrc/offline-rnn-lm.cc
+index 7938605..4c8b557 100644
+--- a/sherpa-onnx/csrc/offline-rnn-lm.cc
++++ b/sherpa-onnx/csrc/offline-rnn-lm.cc
+@@ -1,3 +1,4 @@
++#include "sherpa-onnx/csrc/private-ort-env.h"
+ // sherpa-onnx/csrc/offline-rnn-lm.cc
+ //
+ // Copyright (c)  2023  Xiaomi Corporation
+@@ -78,7 +79,7 @@ class OfflineRnnLM::Impl {
+ 
+  private:
+   OfflineLMConfig config_;
+-  Ort::Env env_;
++  PrivateOrtEnv env_;
+   Ort::SessionOptions sess_opts_;
+   Ort::AllocatorWithDefaultOptions allocator_;
+ 
+diff --git a/sherpa-onnx/csrc/offline-sense-voice-model.cc b/sherpa-onnx/csrc/offline-sense-voice-model.cc
+index 78b31cc..d49d6c1 100644
+--- a/sherpa-onnx/csrc/offline-sense-voice-model.cc
++++ b/sherpa-onnx/csrc/offline-sense-voice-model.cc
+@@ -1,3 +1,4 @@
++#include "sherpa-onnx/csrc/private-ort-env.h"
+ // sherpa-onnx/csrc/offline-sense-voice-model.cc
+ //
+ // Copyright (c)  2022-2023  Xiaomi Corporation
+@@ -150,7 +151,7 @@ class OfflineSenseVoiceModel::Impl {
+ 
+  private:
+   OfflineModelConfig config_;
+-  Ort::Env env_;
++  PrivateOrtEnv env_;
+   Ort::SessionOptions sess_opts_;
+   Ort::AllocatorWithDefaultOptions allocator_;
+ 
+diff --git a/sherpa-onnx/csrc/offline-source-separation-spleeter-model.cc b/sherpa-onnx/csrc/offline-source-separation-spleeter-model.cc
+index 5a4a222..4fd0279 100644
+--- a/sherpa-onnx/csrc/offline-source-separation-spleeter-model.cc
++++ b/sherpa-onnx/csrc/offline-source-separation-spleeter-model.cc
+@@ -1,3 +1,4 @@
++#include "sherpa-onnx/csrc/private-ort-env.h"
+ // sherpa-onnx/csrc/offline-source-separation-spleeter-model.cc
+ //
+ // Copyright (c)  2025  Xiaomi Corporation
+@@ -163,7 +164,7 @@ class OfflineSourceSeparationSpleeterModel::Impl {
+   OfflineSourceSeparationModelConfig config_;
+   OfflineSourceSeparationSpleeterModelMetaData meta_;
+ 
+-  Ort::Env env_;
++  PrivateOrtEnv env_;
+   Ort::SessionOptions sess_opts_;
+   Ort::AllocatorWithDefaultOptions allocator_;
+ 
+diff --git a/sherpa-onnx/csrc/offline-source-separation-uvr-model.cc b/sherpa-onnx/csrc/offline-source-separation-uvr-model.cc
+index 061df20..de55292 100644
+--- a/sherpa-onnx/csrc/offline-source-separation-uvr-model.cc
++++ b/sherpa-onnx/csrc/offline-source-separation-uvr-model.cc
+@@ -1,3 +1,4 @@
++#include "sherpa-onnx/csrc/private-ort-env.h"
+ // sherpa-onnx/csrc/offline-source-separation-uvr-model.cc
+ //
+ // Copyright (c)  2025  Xiaomi Corporation
+@@ -134,7 +135,7 @@ class OfflineSourceSeparationUvrModel::Impl {
+   OfflineSourceSeparationModelConfig config_;
+   OfflineSourceSeparationUvrModelMetaData meta_;
+ 
+-  Ort::Env env_;
++  PrivateOrtEnv env_;
+   Ort::SessionOptions sess_opts_;
+   Ort::AllocatorWithDefaultOptions allocator_;
+ 
+diff --git a/sherpa-onnx/csrc/offline-speaker-segmentation-pyannote-model.cc b/sherpa-onnx/csrc/offline-speaker-segmentation-pyannote-model.cc
+index 27493ed..4f2f7a8 100644
+--- a/sherpa-onnx/csrc/offline-speaker-segmentation-pyannote-model.cc
++++ b/sherpa-onnx/csrc/offline-speaker-segmentation-pyannote-model.cc
+@@ -1,3 +1,4 @@
++#include "sherpa-onnx/csrc/private-ort-env.h"
+ // sherpa-onnx/csrc/offline-speaker-segmentation-pyannote-model.cc
+ //
+ // Copyright (c)  2024  Xiaomi Corporation
+@@ -129,7 +130,7 @@ class OfflineSpeakerSegmentationPyannoteModel::Impl {
+ 
+  private:
+   OfflineSpeakerSegmentationModelConfig config_;
+-  Ort::Env env_;
++  PrivateOrtEnv env_;
+   Ort::SessionOptions sess_opts_;
+   Ort::AllocatorWithDefaultOptions allocator_;
+ 
+diff --git a/sherpa-onnx/csrc/offline-speech-denoiser-dpdfnet-model.cc b/sherpa-onnx/csrc/offline-speech-denoiser-dpdfnet-model.cc
+index 7a64a6c..c9a6efc 100644
+--- a/sherpa-onnx/csrc/offline-speech-denoiser-dpdfnet-model.cc
++++ b/sherpa-onnx/csrc/offline-speech-denoiser-dpdfnet-model.cc
+@@ -1,3 +1,4 @@
++#include "sherpa-onnx/csrc/private-ort-env.h"
+ // sherpa-onnx/csrc/offline-speech-denoiser-dpdfnet-model.cc
+ //
+ // Copyright (c)  2026  Ceva Inc
+@@ -325,7 +326,7 @@ class OfflineSpeechDenoiserDpdfNetModel::Impl {
+   OfflineSpeechDenoiserModelConfig config_;
+   OfflineSpeechDenoiserDpdfNetModelMetaData meta_;
+ 
+-  Ort::Env env_;
++  PrivateOrtEnv env_;
+   Ort::SessionOptions sess_opts_;
+   Ort::AllocatorWithDefaultOptions allocator_;
+ 
+diff --git a/sherpa-onnx/csrc/offline-speech-denoiser-gtcrn-model.cc b/sherpa-onnx/csrc/offline-speech-denoiser-gtcrn-model.cc
+index 6fd54cc..7fff257 100644
+--- a/sherpa-onnx/csrc/offline-speech-denoiser-gtcrn-model.cc
++++ b/sherpa-onnx/csrc/offline-speech-denoiser-gtcrn-model.cc
+@@ -1,3 +1,4 @@
++#include "sherpa-onnx/csrc/private-ort-env.h"
+ // sherpa-onnx/csrc/offline-speech-denoiser-gtcrn-model.cc
+ //
+ // Copyright (c)  2025  Xiaomi Corporation
+@@ -170,7 +171,7 @@ class OfflineSpeechDenoiserGtcrnModel::Impl {
+   OfflineSpeechDenoiserModelConfig config_;
+   OfflineSpeechDenoiserGtcrnModelMetaData meta_;
+ 
+-  Ort::Env env_;
++  PrivateOrtEnv env_;
+   Ort::SessionOptions sess_opts_;
+   Ort::AllocatorWithDefaultOptions allocator_;
+ 
+diff --git a/sherpa-onnx/csrc/offline-tdnn-ctc-model.cc b/sherpa-onnx/csrc/offline-tdnn-ctc-model.cc
+index e1dfae4..35aec1d 100644
+--- a/sherpa-onnx/csrc/offline-tdnn-ctc-model.cc
++++ b/sherpa-onnx/csrc/offline-tdnn-ctc-model.cc
+@@ -1,3 +1,4 @@
++#include "sherpa-onnx/csrc/private-ort-env.h"
+ // sherpa-onnx/csrc/offline-tdnn-ctc-model.cc
+ //
+ // Copyright (c)  2023  Xiaomi Corporation
+@@ -112,7 +113,7 @@ class OfflineTdnnCtcModel::Impl {
+ 
+  private:
+   OfflineModelConfig config_;
+-  Ort::Env env_;
++  PrivateOrtEnv env_;
+   Ort::SessionOptions sess_opts_;
+   Ort::AllocatorWithDefaultOptions allocator_;
+ 
+diff --git a/sherpa-onnx/csrc/offline-telespeech-ctc-model.cc b/sherpa-onnx/csrc/offline-telespeech-ctc-model.cc
+index a7dbc0c..3a2b804 100644
+--- a/sherpa-onnx/csrc/offline-telespeech-ctc-model.cc
++++ b/sherpa-onnx/csrc/offline-telespeech-ctc-model.cc
+@@ -1,3 +1,4 @@
++#include "sherpa-onnx/csrc/private-ort-env.h"
+ // sherpa-onnx/csrc/offline-telespeech-ctc-model.cc
+ //
+ // Copyright (c)  2023-2024  Xiaomi Corporation
+@@ -123,7 +124,7 @@ class OfflineTeleSpeechCtcModel::Impl {
+ 
+  private:
+   OfflineModelConfig config_;
+-  Ort::Env env_;
++  PrivateOrtEnv env_;
+   Ort::SessionOptions sess_opts_;
+   Ort::AllocatorWithDefaultOptions allocator_;
+ 
+diff --git a/sherpa-onnx/csrc/offline-transducer-model.cc b/sherpa-onnx/csrc/offline-transducer-model.cc
+index b7fff5a..a5ed12b 100644
+--- a/sherpa-onnx/csrc/offline-transducer-model.cc
++++ b/sherpa-onnx/csrc/offline-transducer-model.cc
+@@ -1,3 +1,4 @@
++#include "sherpa-onnx/csrc/private-ort-env.h"
+ // sherpa-onnx/csrc/offline-transducer-model.cc
+ //
+ // Copyright (c)  2023  Xiaomi Corporation
+@@ -333,7 +334,7 @@ class OfflineTransducerModel::Impl {
+ 
+  private:
+   OfflineModelConfig config_;
+-  Ort::Env env_;
++  PrivateOrtEnv env_;
+   Ort::SessionOptions sess_opts_;
+   Ort::AllocatorWithDefaultOptions allocator_;
+ 
+diff --git a/sherpa-onnx/csrc/offline-transducer-nemo-model.cc b/sherpa-onnx/csrc/offline-transducer-nemo-model.cc
+index 027ee34..786939a 100644
+--- a/sherpa-onnx/csrc/offline-transducer-nemo-model.cc
++++ b/sherpa-onnx/csrc/offline-transducer-nemo-model.cc
+@@ -1,3 +1,4 @@
++#include "sherpa-onnx/csrc/private-ort-env.h"
+ // sherpa-onnx/csrc/offline-transducer-nemo-model.cc
+ //
+ // Copyright (c)  2024  Xiaomi Corporation
+@@ -284,7 +285,7 @@ class OfflineTransducerNeMoModel::Impl {
+ 
+  private:
+   OfflineModelConfig config_;
+-  Ort::Env env_;
++  PrivateOrtEnv env_;
+   Ort::SessionOptions sess_opts_;
+   Ort::AllocatorWithDefaultOptions allocator_;
+ 
+diff --git a/sherpa-onnx/csrc/offline-tts-kitten-model.cc b/sherpa-onnx/csrc/offline-tts-kitten-model.cc
+index bc1e3ad..6b95d3c 100644
+--- a/sherpa-onnx/csrc/offline-tts-kitten-model.cc
++++ b/sherpa-onnx/csrc/offline-tts-kitten-model.cc
+@@ -1,3 +1,4 @@
++#include "sherpa-onnx/csrc/private-ort-env.h"
+ // sherpa-onnx/csrc/offline-tts-kitten-model.cc
+ //
+ // Copyright (c)  2025  Xiaomi Corporation
+@@ -292,7 +293,7 @@ class OfflineTtsKittenModel::Impl {
+ 
+  private:
+   OfflineTtsModelConfig config_;
+-  Ort::Env env_;
++  PrivateOrtEnv env_;
+   Ort::SessionOptions sess_opts_;
+   Ort::AllocatorWithDefaultOptions allocator_;
+ 
+diff --git a/sherpa-onnx/csrc/offline-tts-kokoro-model.cc b/sherpa-onnx/csrc/offline-tts-kokoro-model.cc
+index e473b37..040e1f0 100644
+--- a/sherpa-onnx/csrc/offline-tts-kokoro-model.cc
++++ b/sherpa-onnx/csrc/offline-tts-kokoro-model.cc
+@@ -1,3 +1,4 @@
++#include "sherpa-onnx/csrc/private-ort-env.h"
+ // sherpa-onnx/csrc/offline-tts-kokoro-model.cc
+ //
+ // Copyright (c)  2025  Xiaomi Corporation
+@@ -212,7 +213,7 @@ class OfflineTtsKokoroModel::Impl {
+ 
+  private:
+   OfflineTtsModelConfig config_;
+-  Ort::Env env_;
++  PrivateOrtEnv env_;
+   Ort::SessionOptions sess_opts_;
+   Ort::AllocatorWithDefaultOptions allocator_;
+ 
+diff --git a/sherpa-onnx/csrc/offline-tts-matcha-model.cc b/sherpa-onnx/csrc/offline-tts-matcha-model.cc
+index 9b7954e..abff938 100644
+--- a/sherpa-onnx/csrc/offline-tts-matcha-model.cc
++++ b/sherpa-onnx/csrc/offline-tts-matcha-model.cc
+@@ -1,3 +1,4 @@
++#include "sherpa-onnx/csrc/private-ort-env.h"
+ // sherpa-onnx/csrc/offline-tts-matcha-model.cc
+ //
+ // Copyright (c)  2024  Xiaomi Corporation
+@@ -191,7 +192,7 @@ class OfflineTtsMatchaModel::Impl {
+ 
+  private:
+   OfflineTtsModelConfig config_;
+-  Ort::Env env_;
++  PrivateOrtEnv env_;
+   Ort::SessionOptions sess_opts_;
+   Ort::AllocatorWithDefaultOptions allocator_;
+ 
+diff --git a/sherpa-onnx/csrc/offline-tts-pocket-model.cc b/sherpa-onnx/csrc/offline-tts-pocket-model.cc
+index fd75312..05c41cd 100644
+--- a/sherpa-onnx/csrc/offline-tts-pocket-model.cc
++++ b/sherpa-onnx/csrc/offline-tts-pocket-model.cc
+@@ -1,3 +1,4 @@
++#include "sherpa-onnx/csrc/private-ort-env.h"
+ // sherpa-onnx/csrc/offline-tts-pocket-model.cc
+ //
+ // Copyright (c)  2026  Xiaomi Corporation
+@@ -344,7 +345,7 @@ class OfflineTtsPocketModel::Impl {
+  private:
+   OfflineTtsModelConfig config_;
+ 
+-  Ort::Env env_;
++  PrivateOrtEnv env_;
+   Ort::SessionOptions sess_opts_;
+   Ort::AllocatorWithDefaultOptions allocator_;
+ 
+diff --git a/sherpa-onnx/csrc/offline-tts-supertonic-model.cc b/sherpa-onnx/csrc/offline-tts-supertonic-model.cc
+index 9f8b3ab..ab0fea0 100644
+--- a/sherpa-onnx/csrc/offline-tts-supertonic-model.cc
++++ b/sherpa-onnx/csrc/offline-tts-supertonic-model.cc
+@@ -1,3 +1,4 @@
++#include "sherpa-onnx/csrc/private-ort-env.h"
+ // sherpa-onnx/csrc/offline-tts-supertonic-model.cc
+ //
+ // Copyright (c)  2026 zengyw
+@@ -367,7 +368,7 @@ class OfflineTtsSupertonicModel::Impl {
+   }
+ 
+   OfflineTtsModelConfig config_;
+-  Ort::Env env_;
++  PrivateOrtEnv env_;
+   Ort::SessionOptions sess_opts_;
+   SupertonicConfig cfg_;
+ 
+diff --git a/sherpa-onnx/csrc/offline-tts-vits-model.cc b/sherpa-onnx/csrc/offline-tts-vits-model.cc
+index b16b5a2..3e76e53 100644
+--- a/sherpa-onnx/csrc/offline-tts-vits-model.cc
++++ b/sherpa-onnx/csrc/offline-tts-vits-model.cc
+@@ -1,3 +1,4 @@
++#include "sherpa-onnx/csrc/private-ort-env.h"
+ // sherpa-onnx/csrc/offline-tts-vits-model.cc
+ //
+ // Copyright (c)  2023  Xiaomi Corporation
+@@ -405,7 +406,7 @@ class OfflineTtsVitsModel::Impl {
+ 
+  private:
+   OfflineTtsModelConfig config_;
+-  Ort::Env env_;
++  PrivateOrtEnv env_;
+   Ort::SessionOptions sess_opts_;
+   Ort::AllocatorWithDefaultOptions allocator_;
+ 
+diff --git a/sherpa-onnx/csrc/offline-tts-zipvoice-model.cc b/sherpa-onnx/csrc/offline-tts-zipvoice-model.cc
+index 03c00b9..0ecaf00 100644
+--- a/sherpa-onnx/csrc/offline-tts-zipvoice-model.cc
++++ b/sherpa-onnx/csrc/offline-tts-zipvoice-model.cc
+@@ -1,3 +1,4 @@
++#include "sherpa-onnx/csrc/private-ort-env.h"
+ // sherpa-onnx/csrc/offline-tts-zipvoice-model.cc
+ //
+ // Copyright (c)  2025  Xiaomi Corporation
+@@ -336,7 +337,7 @@ class OfflineTtsZipvoiceModel::Impl {
+ 
+  private:
+   OfflineTtsModelConfig config_;
+-  Ort::Env env_;
++  PrivateOrtEnv env_;
+   Ort::SessionOptions sess_opts_;
+   Ort::AllocatorWithDefaultOptions allocator_;
+ 
+diff --git a/sherpa-onnx/csrc/offline-wenet-ctc-model.cc b/sherpa-onnx/csrc/offline-wenet-ctc-model.cc
+index 6852efc..c9ef758 100644
+--- a/sherpa-onnx/csrc/offline-wenet-ctc-model.cc
++++ b/sherpa-onnx/csrc/offline-wenet-ctc-model.cc
+@@ -1,3 +1,4 @@
++#include "sherpa-onnx/csrc/private-ort-env.h"
+ // sherpa-onnx/csrc/offline-wenet-ctc-model.cc
+ //
+ // Copyright (c)  2023  Xiaomi Corporation
+@@ -99,7 +100,7 @@ class OfflineWenetCtcModel::Impl {
+ 
+  private:
+   OfflineModelConfig config_;
+-  Ort::Env env_;
++  PrivateOrtEnv env_;
+   Ort::SessionOptions sess_opts_;
+   Ort::AllocatorWithDefaultOptions allocator_;
+ 
+diff --git a/sherpa-onnx/csrc/offline-whisper-model.cc b/sherpa-onnx/csrc/offline-whisper-model.cc
+index 37d1e17..43295be 100644
+--- a/sherpa-onnx/csrc/offline-whisper-model.cc
++++ b/sherpa-onnx/csrc/offline-whisper-model.cc
+@@ -1,3 +1,4 @@
++#include "sherpa-onnx/csrc/private-ort-env.h"
+ // sherpa-onnx/csrc/offline-whisper-model.cc
+ //
+ // Copyright (c)  2022-2023  Xiaomi Corporation
+@@ -445,7 +446,7 @@ class OfflineWhisperModel::Impl {
+ 
+   OfflineModelConfig config_;
+   SpokenLanguageIdentificationConfig lid_config_;
+-  Ort::Env env_;
++  PrivateOrtEnv env_;
+   Ort::SessionOptions sess_opts_;
+   Ort::AllocatorWithDefaultOptions allocator_;
+ 
+diff --git a/sherpa-onnx/csrc/offline-zipformer-audio-tagging-model.cc b/sherpa-onnx/csrc/offline-zipformer-audio-tagging-model.cc
+index 4859906..a5d8b88 100644
+--- a/sherpa-onnx/csrc/offline-zipformer-audio-tagging-model.cc
++++ b/sherpa-onnx/csrc/offline-zipformer-audio-tagging-model.cc
+@@ -1,3 +1,4 @@
++#include "sherpa-onnx/csrc/private-ort-env.h"
+ // sherpa-onnx/csrc/offline-zipformer-audio-tagging-model.cc
+ //
+ // Copyright (c)  2024  Xiaomi Corporation
+@@ -86,7 +87,7 @@ class OfflineZipformerAudioTaggingModel::Impl {
+ 
+  private:
+   AudioTaggingModelConfig config_;
+-  Ort::Env env_;
++  PrivateOrtEnv env_;
+   Ort::SessionOptions sess_opts_;
+   Ort::AllocatorWithDefaultOptions allocator_;
+ 
+diff --git a/sherpa-onnx/csrc/offline-zipformer-ctc-model.cc b/sherpa-onnx/csrc/offline-zipformer-ctc-model.cc
+index d9a6d7f..5c7c183 100644
+--- a/sherpa-onnx/csrc/offline-zipformer-ctc-model.cc
++++ b/sherpa-onnx/csrc/offline-zipformer-ctc-model.cc
+@@ -1,3 +1,4 @@
++#include "sherpa-onnx/csrc/private-ort-env.h"
+ // sherpa-onnx/csrc/offline-zipformer-ctc-model.cc
+ //
+ // Copyright (c)  2023  Xiaomi Corporation
+@@ -98,7 +99,7 @@ class OfflineZipformerCtcModel::Impl {
+ 
+  private:
+   OfflineModelConfig config_;
+-  Ort::Env env_;
++  PrivateOrtEnv env_;
+   Ort::SessionOptions sess_opts_;
+   Ort::AllocatorWithDefaultOptions allocator_;
+ 
+diff --git a/sherpa-onnx/csrc/online-cnn-bilstm-model.cc b/sherpa-onnx/csrc/online-cnn-bilstm-model.cc
+index 49537d6..526db23 100644
+--- a/sherpa-onnx/csrc/online-cnn-bilstm-model.cc
++++ b/sherpa-onnx/csrc/online-cnn-bilstm-model.cc
+@@ -1,3 +1,4 @@
++#include "sherpa-onnx/csrc/private-ort-env.h"
+ // sherpa-onnx/csrc/online-cnn-bilstm-model.cc
+ //
+ // Copyright (c) 2024 Jian You (jianyou@cisco.com, Cisco Systems)
+@@ -113,7 +114,7 @@ class OnlineCNNBiLSTMModel::Impl {
+ 
+  private:
+   OnlinePunctuationModelConfig config_;
+-  Ort::Env env_;
++  PrivateOrtEnv env_;
+   Ort::SessionOptions sess_opts_;
+   Ort::AllocatorWithDefaultOptions allocator_;
+ 
+diff --git a/sherpa-onnx/csrc/online-conformer-transducer-model.h b/sherpa-onnx/csrc/online-conformer-transducer-model.h
+index b03ada0..0be16ae 100644
+--- a/sherpa-onnx/csrc/online-conformer-transducer-model.h
++++ b/sherpa-onnx/csrc/online-conformer-transducer-model.h
+@@ -1,3 +1,4 @@
++#include "sherpa-onnx/csrc/private-ort-env.h"
+ // sherpa-onnx/csrc/online-conformer-transducer-model.h
+ //
+ // Copyright (c) 2023 Jingzhao Ou (jingzhao.ou@gmail.com)
+@@ -54,7 +55,7 @@ class OnlineConformerTransducerModel : public OnlineTransducerModel {
+   void InitJoiner(void *model_data, size_t model_data_length);
+ 
+  private:
+-  Ort::Env env_;
++  PrivateOrtEnv env_;
+   Ort::SessionOptions sess_opts_;
+   Ort::AllocatorWithDefaultOptions allocator_;
+ 
+diff --git a/sherpa-onnx/csrc/online-ebranchformer-transducer-model.h b/sherpa-onnx/csrc/online-ebranchformer-transducer-model.h
+index f1438cb..d15458a 100644
+--- a/sherpa-onnx/csrc/online-ebranchformer-transducer-model.h
++++ b/sherpa-onnx/csrc/online-ebranchformer-transducer-model.h
+@@ -1,3 +1,4 @@
++#include "sherpa-onnx/csrc/private-ort-env.h"
+ // sherpa-onnx/csrc/online-ebranchformer-transducer-model.h
+ //
+ // Copyright (c)  2023  Xiaomi Corporation
+@@ -59,7 +60,7 @@ class OnlineEbranchformerTransducerModel : public OnlineTransducerModel {
+   void InitJoiner(void *model_data, size_t model_data_length);
+ 
+  private:
+-  Ort::Env env_;
++  PrivateOrtEnv env_;
+   Ort::SessionOptions encoder_sess_opts_;
+   Ort::SessionOptions decoder_sess_opts_;
+   Ort::SessionOptions joiner_sess_opts_;
+diff --git a/sherpa-onnx/csrc/online-lstm-transducer-model.h b/sherpa-onnx/csrc/online-lstm-transducer-model.h
+index 64ade36..104227b 100644
+--- a/sherpa-onnx/csrc/online-lstm-transducer-model.h
++++ b/sherpa-onnx/csrc/online-lstm-transducer-model.h
+@@ -1,3 +1,4 @@
++#include "sherpa-onnx/csrc/private-ort-env.h"
+ // sherpa-onnx/csrc/online-lstm-transducer-model.h
+ //
+ // Copyright (c)  2023  Xiaomi Corporation
+@@ -53,7 +54,7 @@ class OnlineLstmTransducerModel : public OnlineTransducerModel {
+   void InitJoiner(void *model_data, size_t model_data_length);
+ 
+  private:
+-  Ort::Env env_;
++  PrivateOrtEnv env_;
+   Ort::SessionOptions sess_opts_;
+   Ort::AllocatorWithDefaultOptions allocator_;
+ 
+diff --git a/sherpa-onnx/csrc/online-nemo-ctc-model.cc b/sherpa-onnx/csrc/online-nemo-ctc-model.cc
+index d2086d4..c9b8c2b 100644
+--- a/sherpa-onnx/csrc/online-nemo-ctc-model.cc
++++ b/sherpa-onnx/csrc/online-nemo-ctc-model.cc
+@@ -1,3 +1,4 @@
++#include "sherpa-onnx/csrc/private-ort-env.h"
+ // sherpa-onnx/csrc/online-nemo-ctc-model.cc
+ //
+ // Copyright (c)  2023  Xiaomi Corporation
+@@ -272,7 +273,7 @@ class OnlineNeMoCtcModel::Impl {
+ 
+  private:
+   OnlineModelConfig config_;
+-  Ort::Env env_;
++  PrivateOrtEnv env_;
+   Ort::SessionOptions sess_opts_;
+   Ort::AllocatorWithDefaultOptions allocator_;
+ 
+diff --git a/sherpa-onnx/csrc/online-paraformer-model.cc b/sherpa-onnx/csrc/online-paraformer-model.cc
+index 4ca2f0d..6f1bc80 100644
+--- a/sherpa-onnx/csrc/online-paraformer-model.cc
++++ b/sherpa-onnx/csrc/online-paraformer-model.cc
+@@ -1,3 +1,4 @@
++#include "sherpa-onnx/csrc/private-ort-env.h"
+ // sherpa-onnx/csrc/online-paraformer-model.cc
+ //
+ // Copyright (c)  2022-2023  Xiaomi Corporation
+@@ -179,7 +180,7 @@ class OnlineParaformerModel::Impl {
+ 
+  private:
+   OnlineModelConfig config_;
+-  Ort::Env env_;
++  PrivateOrtEnv env_;
+   Ort::SessionOptions sess_opts_;
+   Ort::AllocatorWithDefaultOptions allocator_;
+ 
+diff --git a/sherpa-onnx/csrc/online-recognizer-impl.cc b/sherpa-onnx/csrc/online-recognizer-impl.cc
+index 918ad5d..9945857 100644
+--- a/sherpa-onnx/csrc/online-recognizer-impl.cc
++++ b/sherpa-onnx/csrc/online-recognizer-impl.cc
+@@ -1,3 +1,4 @@
++#include "sherpa-onnx/csrc/private-ort-env.h"
+ // sherpa-onnx/csrc/online-recognizer-impl.cc
+ //
+ // Copyright (c)  2023-2025  Xiaomi Corporation
+@@ -105,7 +106,7 @@ std::unique_ptr<OnlineRecognizerImpl> OnlineRecognizerImpl::Create(
+   }
+ 
+   if (!config.model_config.transducer.encoder.empty()) {
+-    Ort::Env env = ORT_LOGGING_LEVEL_ERROR;
++    PrivateOrtEnv env = ORT_LOGGING_LEVEL_ERROR;
+ 
+     Ort::SessionOptions sess_opts;
+     sess_opts.SetIntraOpNumThreads(1);
+@@ -195,7 +196,7 @@ std::unique_ptr<OnlineRecognizerImpl> OnlineRecognizerImpl::Create(
+   }
+ 
+   if (!config.model_config.transducer.encoder.empty()) {
+-    Ort::Env env = ORT_LOGGING_LEVEL_ERROR;
++    PrivateOrtEnv env = ORT_LOGGING_LEVEL_ERROR;
+ 
+     Ort::SessionOptions sess_opts;
+     sess_opts.SetIntraOpNumThreads(1);
+diff --git a/sherpa-onnx/csrc/online-rnn-lm.cc b/sherpa-onnx/csrc/online-rnn-lm.cc
+index 313d516..f0b4dc9 100644
+--- a/sherpa-onnx/csrc/online-rnn-lm.cc
++++ b/sherpa-onnx/csrc/online-rnn-lm.cc
+@@ -1,3 +1,4 @@
++#include "sherpa-onnx/csrc/private-ort-env.h"
+ // sherpa-onnx/csrc/on-rnn-lm.cc
+ //
+ // Copyright (c)  2023  Pingfeng Luo
+@@ -212,7 +213,7 @@ class OnlineRnnLM::Impl {
+ 
+  private:
+   OnlineLMConfig config_;
+-  Ort::Env env_;
++  PrivateOrtEnv env_;
+   Ort::SessionOptions sess_opts_;
+   Ort::AllocatorWithDefaultOptions allocator_;
+ 
+diff --git a/sherpa-onnx/csrc/online-t-one-ctc-model.cc b/sherpa-onnx/csrc/online-t-one-ctc-model.cc
+index 4173015..fd1c072 100644
+--- a/sherpa-onnx/csrc/online-t-one-ctc-model.cc
++++ b/sherpa-onnx/csrc/online-t-one-ctc-model.cc
+@@ -1,3 +1,4 @@
++#include "sherpa-onnx/csrc/private-ort-env.h"
+ // sherpa-onnx/csrc/online-t-one-ctc-model.cc
+ //
+ // Copyright (c)  2025  Xiaomi Corporation
+@@ -208,7 +209,7 @@ class OnlineToneCtcModel::Impl {
+ 
+  private:
+   OnlineModelConfig config_;
+-  Ort::Env env_;
++  PrivateOrtEnv env_;
+   Ort::SessionOptions sess_opts_;
+   Ort::AllocatorWithDefaultOptions allocator_;
+ 
+diff --git a/sherpa-onnx/csrc/online-transducer-model.cc b/sherpa-onnx/csrc/online-transducer-model.cc
+index 1cb9cdf..5534d42 100644
+--- a/sherpa-onnx/csrc/online-transducer-model.cc
++++ b/sherpa-onnx/csrc/online-transducer-model.cc
+@@ -1,3 +1,4 @@
++#include "sherpa-onnx/csrc/private-ort-env.h"
+ // sherpa-onnx/csrc/online-transducer-model.cc
+ //
+ // Copyright (c)  2023  Xiaomi Corporation
+@@ -46,7 +47,7 @@ enum class ModelType : std::uint8_t {
+ namespace sherpa_onnx {
+ 
+ static ModelType GetModelType(const std::string &model_path, bool debug) {
+-  Ort::Env env = ORT_LOGGING_LEVEL_ERROR;
++  PrivateOrtEnv env = ORT_LOGGING_LEVEL_ERROR;
+   Ort::SessionOptions sess_opts;
+   sess_opts.SetIntraOpNumThreads(1);
+   sess_opts.SetInterOpNumThreads(1);
+@@ -95,7 +96,7 @@ static ModelType GetModelType(const std::string &model_path, bool debug) {
+ 
+ static ModelType GetModelType(char *model_data, size_t model_data_length,
+                               bool debug) {
+-  Ort::Env env = ORT_LOGGING_LEVEL_ERROR;
++  PrivateOrtEnv env = ORT_LOGGING_LEVEL_ERROR;
+   Ort::SessionOptions sess_opts;
+   sess_opts.SetIntraOpNumThreads(1);
+   sess_opts.SetInterOpNumThreads(1);
+diff --git a/sherpa-onnx/csrc/online-transducer-nemo-model.cc b/sherpa-onnx/csrc/online-transducer-nemo-model.cc
+index 9183001..6e0a8ec 100644
+--- a/sherpa-onnx/csrc/online-transducer-nemo-model.cc
++++ b/sherpa-onnx/csrc/online-transducer-nemo-model.cc
+@@ -1,3 +1,4 @@
++#include "sherpa-onnx/csrc/private-ort-env.h"
+ // sherpa-onnx/csrc/online-transducer-nemo-model.cc
+ //
+ // Copyright (c)  2024  Xiaomi Corporation
+@@ -634,7 +635,7 @@ class OnlineTransducerNeMoModel::Impl {
+ 
+  private:
+   OnlineModelConfig config_;
+-  Ort::Env env_;
++  PrivateOrtEnv env_;
+   Ort::SessionOptions sess_opts_;
+   Ort::AllocatorWithDefaultOptions allocator_;
+ 
+diff --git a/sherpa-onnx/csrc/online-transducer-nemo-parakeet-unified-model.cc b/sherpa-onnx/csrc/online-transducer-nemo-parakeet-unified-model.cc
+index 0efe5c8..9a5f60b 100644
+--- a/sherpa-onnx/csrc/online-transducer-nemo-parakeet-unified-model.cc
++++ b/sherpa-onnx/csrc/online-transducer-nemo-parakeet-unified-model.cc
+@@ -1,3 +1,4 @@
++#include "sherpa-onnx/csrc/private-ort-env.h"
+ // sherpa-onnx/csrc/online-transducer-nemo-parakeet-unified-model.cc
+ //
+ // Copyright (c)  2026  Milan Leonard
+@@ -323,7 +324,7 @@ class OnlineTransducerNeMoParakeetUnifiedModel::Impl {
+ 
+  private:
+   OnlineModelConfig config_;
+-  Ort::Env env_;
++  PrivateOrtEnv env_;
+   Ort::SessionOptions sess_opts_;
+   Ort::AllocatorWithDefaultOptions allocator_;
+ 
+diff --git a/sherpa-onnx/csrc/online-wenet-ctc-model.cc b/sherpa-onnx/csrc/online-wenet-ctc-model.cc
+index a9656e2..1115546 100644
+--- a/sherpa-onnx/csrc/online-wenet-ctc-model.cc
++++ b/sherpa-onnx/csrc/online-wenet-ctc-model.cc
+@@ -1,3 +1,4 @@
++#include "sherpa-onnx/csrc/private-ort-env.h"
+ // sherpa-onnx/csrc/online-wenet-ctc-model.cc
+ //
+ // Copyright (c)  2023  Xiaomi Corporation
+@@ -199,7 +200,7 @@ class OnlineWenetCtcModel::Impl {
+ 
+  private:
+   OnlineModelConfig config_;
+-  Ort::Env env_;
++  PrivateOrtEnv env_;
+   Ort::SessionOptions sess_opts_;
+   Ort::AllocatorWithDefaultOptions allocator_;
+ 
+diff --git a/sherpa-onnx/csrc/online-zipformer-transducer-model.h b/sherpa-onnx/csrc/online-zipformer-transducer-model.h
+index 9e4368a..b8a4c85 100644
+--- a/sherpa-onnx/csrc/online-zipformer-transducer-model.h
++++ b/sherpa-onnx/csrc/online-zipformer-transducer-model.h
+@@ -1,3 +1,4 @@
++#include "sherpa-onnx/csrc/private-ort-env.h"
+ // sherpa-onnx/csrc/online-zipformer-transducer-model.h
+ //
+ // Copyright (c)  2023  Xiaomi Corporation
+@@ -53,7 +54,7 @@ class OnlineZipformerTransducerModel : public OnlineTransducerModel {
+   void InitJoiner(void *model_data, size_t model_data_length);
+ 
+  private:
+-  Ort::Env env_;
++  PrivateOrtEnv env_;
+   Ort::SessionOptions sess_opts_;
+   Ort::AllocatorWithDefaultOptions allocator_;
+ 
+diff --git a/sherpa-onnx/csrc/online-zipformer2-ctc-model.cc b/sherpa-onnx/csrc/online-zipformer2-ctc-model.cc
+index c1907fe..0338a48 100644
+--- a/sherpa-onnx/csrc/online-zipformer2-ctc-model.cc
++++ b/sherpa-onnx/csrc/online-zipformer2-ctc-model.cc
+@@ -1,3 +1,4 @@
++#include "sherpa-onnx/csrc/private-ort-env.h"
+ // sherpa-onnx/csrc/online-zipformer2-ctc-model.cc
+ //
+ // Copyright (c)  2023  Xiaomi Corporation
+@@ -409,7 +410,7 @@ class OnlineZipformer2CtcModel::Impl {
+ 
+  private:
+   OnlineModelConfig config_;
+-  Ort::Env env_;
++  PrivateOrtEnv env_;
+   Ort::SessionOptions sess_opts_;
+   Ort::AllocatorWithDefaultOptions allocator_;
+ 
+diff --git a/sherpa-onnx/csrc/online-zipformer2-transducer-model.h b/sherpa-onnx/csrc/online-zipformer2-transducer-model.h
+index b072b73..b364966 100644
+--- a/sherpa-onnx/csrc/online-zipformer2-transducer-model.h
++++ b/sherpa-onnx/csrc/online-zipformer2-transducer-model.h
+@@ -1,3 +1,4 @@
++#include "sherpa-onnx/csrc/private-ort-env.h"
+ // sherpa-onnx/csrc/online-zipformer2-transducer-model.h
+ //
+ // Copyright (c)  2023  Xiaomi Corporation
+@@ -60,7 +61,7 @@ class OnlineZipformer2TransducerModel : public OnlineTransducerModel {
+   void InitJoiner(void *model_data, size_t model_data_length);
+ 
+  private:
+-  Ort::Env env_;
++  PrivateOrtEnv env_;
+   Ort::SessionOptions encoder_sess_opts_;
+   Ort::SessionOptions decoder_sess_opts_;
+   Ort::SessionOptions joiner_sess_opts_;
+diff --git a/sherpa-onnx/csrc/silero-vad-model.cc b/sherpa-onnx/csrc/silero-vad-model.cc
+index aa03756..d3ec063 100644
+--- a/sherpa-onnx/csrc/silero-vad-model.cc
++++ b/sherpa-onnx/csrc/silero-vad-model.cc
+@@ -1,3 +1,4 @@
++#include "sherpa-onnx/csrc/private-ort-env.h"
+ // sherpa-onnx/csrc/silero-vad-model.cc
+ //
+ // Copyright (c)  2023  Xiaomi Corporation
+@@ -451,7 +452,7 @@ class SileroVadModel::Impl {
+  private:
+   VadModelConfig config_;
+ 
+-  Ort::Env env_;
++  PrivateOrtEnv env_;
+   Ort::SessionOptions sess_opts_;
+   Ort::AllocatorWithDefaultOptions allocator_;
+ 
+diff --git a/sherpa-onnx/csrc/speaker-embedding-extractor-impl.cc b/sherpa-onnx/csrc/speaker-embedding-extractor-impl.cc
+index 2a425f0..1b9ccb0 100644
+--- a/sherpa-onnx/csrc/speaker-embedding-extractor-impl.cc
++++ b/sherpa-onnx/csrc/speaker-embedding-extractor-impl.cc
+@@ -1,3 +1,4 @@
++#include "sherpa-onnx/csrc/private-ort-env.h"
+ // sherpa-onnx/csrc/speaker-embedding-extractor-impl.cc
+ //
+ // Copyright (c)  2024  Xiaomi Corporation
+@@ -36,7 +37,7 @@ enum class ModelType : std::uint8_t {
+ }  // namespace
+ 
+ static ModelType GetModelType(const std::string &model_path, bool debug) {
+-  Ort::Env env = ORT_LOGGING_LEVEL_ERROR;
++  PrivateOrtEnv env = ORT_LOGGING_LEVEL_ERROR;
+   Ort::SessionOptions sess_opts;
+   sess_opts.SetIntraOpNumThreads(1);
+   sess_opts.SetInterOpNumThreads(1);
+@@ -88,7 +89,7 @@ static ModelType GetModelType(const std::string &model_path, bool debug) {
+ 
+ static ModelType GetModelType(char *model_data, size_t model_data_length,
+                               bool debug) {
+-  Ort::Env env = ORT_LOGGING_LEVEL_ERROR;
++  PrivateOrtEnv env = ORT_LOGGING_LEVEL_ERROR;
+   Ort::SessionOptions sess_opts;
+   sess_opts.SetIntraOpNumThreads(1);
+   sess_opts.SetInterOpNumThreads(1);
+diff --git a/sherpa-onnx/csrc/speaker-embedding-extractor-model.cc b/sherpa-onnx/csrc/speaker-embedding-extractor-model.cc
+index a014712..51cdb90 100644
+--- a/sherpa-onnx/csrc/speaker-embedding-extractor-model.cc
++++ b/sherpa-onnx/csrc/speaker-embedding-extractor-model.cc
+@@ -1,3 +1,4 @@
++#include "sherpa-onnx/csrc/private-ort-env.h"
+ // sherpa-onnx/csrc/speaker-embedding-extractor-model.cc
+ //
+ // Copyright (c)  2024  Xiaomi Corporation
+@@ -119,7 +120,7 @@ class SpeakerEmbeddingExtractorModel::Impl {
+ 
+  private:
+   SpeakerEmbeddingExtractorConfig config_;
+-  Ort::Env env_;
++  PrivateOrtEnv env_;
+   Ort::SessionOptions sess_opts_;
+   Ort::AllocatorWithDefaultOptions allocator_;
+ 
+diff --git a/sherpa-onnx/csrc/speaker-embedding-extractor-nemo-model.cc b/sherpa-onnx/csrc/speaker-embedding-extractor-nemo-model.cc
+index 56bdccd..aff44da 100644
+--- a/sherpa-onnx/csrc/speaker-embedding-extractor-nemo-model.cc
++++ b/sherpa-onnx/csrc/speaker-embedding-extractor-nemo-model.cc
+@@ -1,3 +1,4 @@
++#include "sherpa-onnx/csrc/private-ort-env.h"
+ // sherpa-onnx/csrc/speaker-embedding-extractor-nemo-model.cc
+ //
+ // Copyright (c)  2024  Xiaomi Corporation
+@@ -126,7 +127,7 @@ class SpeakerEmbeddingExtractorNeMoModel::Impl {
+ 
+  private:
+   SpeakerEmbeddingExtractorConfig config_;
+-  Ort::Env env_;
++  PrivateOrtEnv env_;
+   Ort::SessionOptions sess_opts_;
+   Ort::AllocatorWithDefaultOptions allocator_;
+ 
+diff --git a/sherpa-onnx/csrc/spoken-language-identification-impl.cc b/sherpa-onnx/csrc/spoken-language-identification-impl.cc
+index 906d55b..62e3298 100644
+--- a/sherpa-onnx/csrc/spoken-language-identification-impl.cc
++++ b/sherpa-onnx/csrc/spoken-language-identification-impl.cc
+@@ -1,3 +1,4 @@
++#include "sherpa-onnx/csrc/private-ort-env.h"
+ // sherpa-onnx/csrc/spoken-language-identification-impl.cc
+ //
+ // Copyright (c)  2024  Xiaomi Corporation
+@@ -29,7 +30,7 @@ enum class ModelType : std::uint8_t {
+ }
+ 
+ static ModelType GetModelType(const std::string &model_path, bool debug) {
+-  Ort::Env env = ORT_LOGGING_LEVEL_ERROR;
++  PrivateOrtEnv env = ORT_LOGGING_LEVEL_ERROR;
+   Ort::SessionOptions sess_opts;
+ 
+   auto sess = std::make_unique<Ort::Session>(
+@@ -67,7 +68,7 @@ static ModelType GetModelType(const std::string &model_path, bool debug) {
+ 
+ static ModelType GetModelType(char *model_data, size_t model_data_length,
+                               bool debug) {
+-  Ort::Env env = ORT_LOGGING_LEVEL_ERROR;
++  PrivateOrtEnv env = ORT_LOGGING_LEVEL_ERROR;
+   Ort::SessionOptions sess_opts;
+ 
+   auto sess = std::make_unique<Ort::Session>(env, model_data, model_data_length,
+diff --git a/sherpa-onnx/csrc/ten-vad-model.cc b/sherpa-onnx/csrc/ten-vad-model.cc
+index 50a0057..e3c94b5 100644
+--- a/sherpa-onnx/csrc/ten-vad-model.cc
++++ b/sherpa-onnx/csrc/ten-vad-model.cc
+@@ -1,3 +1,4 @@
++#include "sherpa-onnx/csrc/private-ort-env.h"
+ // sherpa-onnx/csrc/ten-vad-model.cc
+ //
+ // Copyright (c)  2025  Xiaomi Corporation
+@@ -416,7 +417,7 @@ class TenVadModel::Impl {
+   knf::Rfft rfft_;
+   std::unique_ptr<knf::MelBanks> mel_banks_;
+ 
+-  Ort::Env env_;
++  PrivateOrtEnv env_;
+   Ort::SessionOptions sess_opts_;
+   Ort::AllocatorWithDefaultOptions allocator_;
+ 
+diff --git a/sherpa-onnx/csrc/vocoder.cc b/sherpa-onnx/csrc/vocoder.cc
+index e7857ab..f03919a 100644
+--- a/sherpa-onnx/csrc/vocoder.cc
++++ b/sherpa-onnx/csrc/vocoder.cc
+@@ -1,3 +1,4 @@
++#include "sherpa-onnx/csrc/private-ort-env.h"
+ // sherpa-onnx/csrc/vocoder.cc
+ //
+ // Copyright (c)  2025  Xiaomi Corporation
+@@ -37,7 +38,7 @@ enum class ModelType : std::uint8_t {
+ }  // namespace
+ 
+ static ModelType GetModelType(const std::string &model_path, bool debug) {
+-  Ort::Env env = ORT_LOGGING_LEVEL_ERROR;
++  PrivateOrtEnv env = ORT_LOGGING_LEVEL_ERROR;
+   Ort::SessionOptions sess_opts;
+   sess_opts.SetIntraOpNumThreads(1);
+   sess_opts.SetInterOpNumThreads(1);
+@@ -80,7 +81,7 @@ static ModelType GetModelType(const std::string &model_path, bool debug) {
+ 
+ static ModelType GetModelType(char *model_data, size_t model_data_length,
+                               bool debug) {
+-  Ort::Env env = ORT_LOGGING_LEVEL_ERROR;
++  PrivateOrtEnv env = ORT_LOGGING_LEVEL_ERROR;
+   Ort::SessionOptions sess_opts;
+   sess_opts.SetIntraOpNumThreads(1);
+   sess_opts.SetInterOpNumThreads(1);
+diff --git a/sherpa-onnx/csrc/vocos-vocoder.cc b/sherpa-onnx/csrc/vocos-vocoder.cc
+index 9b078d0..955bcd6 100644
+--- a/sherpa-onnx/csrc/vocos-vocoder.cc
++++ b/sherpa-onnx/csrc/vocos-vocoder.cc
+@@ -1,3 +1,4 @@
++#include "sherpa-onnx/csrc/private-ort-env.h"
+ // sherpa-onnx/csrc/vocos-vocoder.cc
+ //
+ // Copyright (c)  2025  Xiaomi Corporation
+@@ -185,7 +186,7 @@ class VocosVocoder::Impl {
+   OfflineTtsModelConfig config_;
+   VocosModelMetaData meta_;
+ 
+-  Ort::Env env_;
++  PrivateOrtEnv env_;
+   Ort::SessionOptions sess_opts_;
+   Ort::AllocatorWithDefaultOptions allocator_;
+ 
+diff --git a/sherpa-onnx/csrc/private-ort-env.h b/sherpa-onnx/csrc/private-ort-env.h
+new file mode 100644
+index 0000000..4f98640
+--- /dev/null
++++ b/sherpa-onnx/csrc/private-ort-env.h
+@@ -0,0 +1,13 @@
++#pragma once
++#include "onnxruntime_cxx_api.h"
++namespace sherpa_onnx {
++// Keep ONNX diagnostics out of system logging, including malformed input errors.
++class PrivateOrtEnv : public Ort::Env {
++ public:
++  PrivateOrtEnv(OrtLoggingLevel = ORT_LOGGING_LEVEL_FATAL, const char* = nullptr)
++      : Ort::Env(ORT_LOGGING_LEVEL_FATAL, "LocalVoiceTranslator",
++          [](void*, OrtLoggingLevel, const char*, const char*, const char*, const char*) {}, nullptr) {
++    DisableTelemetryEvents();
++  }
++};
++}

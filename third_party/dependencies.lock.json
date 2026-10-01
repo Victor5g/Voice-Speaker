@@ -1,0 +1,264 @@
+{
+  "webrtcvad": {
+    "version": "py-webrtcvad 2.0.10 C subset",
+    "commit": "ba13ceea9dd3f3a068e869b2e94413205bd87f7d",
+    "source": "https://github.com/wiseman/py-webrtcvad",
+    "archiveSHA256": "ff6f6417ba0a2e8c5dce63fe11605eafa270ec66d6d22ce9b98d412704af6044",
+    "license": "BSD-3-Clause (WebRTC C); MIT (repository wrapper/fixture)",
+    "runtimePython": false,
+    "localModifications": "No upstream C changes; only the standalone C subset is compiled. Python wrapper is not included."
+  },
+  "whisper.cpp": {
+    "version": "1.8.3",
+    "commit": "2eeeba56e9edd762b4b38467bab96c2517163158",
+    "license": "MIT",
+    "source": "https://github.com/ggml-org/whisper.cpp",
+    "localModifications": "Per-context Core ML selection, no silent fallback, validated inference output. Static CPU, Metal, Core ML and Accelerate. Networking/server remain disabled. No-speech probability reads explicitly requested current SOT logits instead of stale/zero first row.",
+    "localPatch": {
+      "filename": "third_party/patches/whisper-coreml-selection.patch",
+      "sha256": "128197866d29275d588f2f086fdeef5865221631d9e89adfb53c9da90ed0f6d2",
+      "purpose": "Per-context Core ML compute units, strict errors, same-mel encoder/cross-attention reuse with invalidation on new input/offset/context. Correct fresh SOT-row no-speech logits, including context-prefixed prompts, without language autodetection."
+    }
+  },
+  "cmake": {
+    "version": "3.31.8",
+    "source": "https://github.com/Kitware/CMake/releases/tag/v3.31.8",
+    "sha256": "d1449f969c54d5c00886d5b643340d493dfb3c81cb39ee29b35453395c11ebf7",
+    "license": "BSD-3-Clause",
+    "purpose": "Development build tool, project-local only"
+  },
+  "ctranslate2": {
+    "version": "4.8.0",
+    "commit": "54a546cec4262f9770d4674a0bfb4ac3c4f05698",
+    "source": "https://github.com/OpenNMT/CTranslate2.git",
+    "license": "MIT",
+    "purpose": "CPU translation; Accelerate and Ruy",
+    "submodules": [
+      " 8a494eb1e158ec2050e5f699a504fbc9b896a43b third_party/cpu_features (8a494eb)",
+      "-bbe579a9e3beb6ea6626d9227ec32d0dae119a49 third_party/cutlass",
+      "-c74846a891b3cc3bfa992d588b1295f528d43039 third_party/cxxopts",
+      "-f8d7d77c06936315286eb55f8de22cd23c188571 third_party/googletest",
+      " 363f252289fb7a1fba1703d99196524698cb884d third_party/ruy (363f252)",
+      " 082deffc80ce517f81dc2f3aebe6ba671fcd09c9 third_party/ruy/third_party/cpuinfo (082deff)",
+      "-6c58c11d5497b6ee1df3cb400ce30deb72fc28c0 third_party/ruy/third_party/googletest",
+      " 76fb40d95455f249bd70824ecfcae7a8f0930fa3 third_party/spdlog (76fb40d)",
+      "-b5fe509fd11a925f90d6495176707cc1184eed9d third_party/thrust"
+    ]
+  },
+  "sentencepiece": {
+    "version": "0.2.0",
+    "commit": "17d7580d6407802f85855d2cc9190634e2c95624",
+    "source": "https://github.com/google/sentencepiece.git",
+    "license": "Apache-2.0",
+    "purpose": "Native tokenization; private protobuf namespace",
+    "localModifications": "Build-only -Dgoogle=lvt_sentencepiece_google isolates bundled protobuf from ONNX Runtime; upstream sources unchanged."
+  },
+  "sherpa-onnx": {
+    "version": "1.13.6",
+    "commit": "1cb484af5e69d3c7803c1eb0b3b5ab8041e0e911",
+    "source": "https://github.com/k2-fsa/sherpa-onnx.git",
+    "license": "Apache-2.0",
+    "purpose": "Native Piper/VITS TTS; private silent ORT environments",
+    "localPatch": {
+      "filename": "third_party/patches/sherpa-private-runtime.patch",
+      "sha256": "94b0919280785ecc11cde4087a996b0eb5661fa43c17e07f987e04e310a23f47",
+      "purpose": "Disable telemetry/content logging, replace fatal exits, and repair two unused upstream example symlinks to remain inside the project."
+    },
+    "dependencyDefinitions": [
+      {
+        "filename": "third_party/sherpa-onnx/cmake/asio.cmake",
+        "sha256": "4261f9681bd5cb05570d276440d4658c62f752e8dc3c0ed7bf5b658eaea02dfa"
+      },
+      {
+        "filename": "third_party/sherpa-onnx/cmake/cargs.cmake",
+        "sha256": "2deabf4fa3854380c486063d8dae96fa9693210e73f08fa0cf6eb3551391e5f3"
+      },
+      {
+        "filename": "third_party/sherpa-onnx/cmake/eigen.cmake",
+        "sha256": "8239d74b44e37e1bb05be2e1c86f6b1e931f0daca93b325fb2e0b6d6e996b2ed"
+      },
+      {
+        "filename": "third_party/sherpa-onnx/cmake/espeak-ng-for-piper.cmake",
+        "sha256": "d353f2becec6c8a2064e314b7d0d9c4e4388b48c7e5742a3ba8a62355952407c"
+      },
+      {
+        "filename": "third_party/sherpa-onnx/cmake/googletest.cmake",
+        "sha256": "5c79ce6d923d2d2bcf15a7f02c2a9c99aca7638975b120bcf55e909b969c6cbe"
+      },
+      {
+        "filename": "third_party/sherpa-onnx/cmake/hclust-cpp.cmake",
+        "sha256": "093ae7b3712119d140df2629b5d20b71bafb3d49ba0124dd7a391f278f4db357"
+      },
+      {
+        "filename": "third_party/sherpa-onnx/cmake/json.cmake",
+        "sha256": "e318b4065954cb479318d191c91e32d5a0cae94a53fff70987791b6f9828b1de"
+      },
+      {
+        "filename": "third_party/sherpa-onnx/cmake/kaldi-decoder.cmake",
+        "sha256": "af34b17974474a70b12978d49ac0831276839082924e5ac93bd9bb194a7fd310"
+      },
+      {
+        "filename": "third_party/sherpa-onnx/cmake/kaldi-native-fbank.cmake",
+        "sha256": "619f0046f568e85790f4180899e666053f246f5c0fc36c951421441f3e992e38"
+      },
+      {
+        "filename": "third_party/sherpa-onnx/cmake/onnxruntime-linux-aarch64-gpu.cmake",
+        "sha256": "81fa67b6dceb74b84a22f683065b5dc1bdf44d50a5f7618ed2360375646c4f27"
+      },
+      {
+        "filename": "third_party/sherpa-onnx/cmake/onnxruntime-linux-aarch64-static.cmake",
+        "sha256": "19a712f07ebc08d32dc662f438410558d696a5a7e359dcaedd8da5da5af1099b"
+      },
+      {
+        "filename": "third_party/sherpa-onnx/cmake/onnxruntime-linux-aarch64.cmake",
+        "sha256": "4e95d0268d0cb0c41fca61ddb364ade3cc8de1571843a05a38057643d62f7ce8"
+      },
+      {
+        "filename": "third_party/sherpa-onnx/cmake/onnxruntime-linux-arm-static.cmake",
+        "sha256": "1a7c3959f8530327c2e1a9df921a6ea873c92cc53f21c3c92399e3cfcb410ec0"
+      },
+      {
+        "filename": "third_party/sherpa-onnx/cmake/onnxruntime-linux-arm.cmake",
+        "sha256": "067927e024f332d42d31f41fad07b6d389a41568627c183c71863a8b03eb5816"
+      },
+      {
+        "filename": "third_party/sherpa-onnx/cmake/onnxruntime-linux-riscv64-spacemit.cmake",
+        "sha256": "610623f52f206b0a9ad45dbc33361592a7642050a4598686365dea0cabbd4ef3"
+      },
+      {
+        "filename": "third_party/sherpa-onnx/cmake/onnxruntime-linux-riscv64-static.cmake",
+        "sha256": "68854547899f189dcde7d84cfc334f7426af70b271f4214ac25dc99b94b29f8c"
+      },
+      {
+        "filename": "third_party/sherpa-onnx/cmake/onnxruntime-linux-riscv64.cmake",
+        "sha256": "667d94a8b445a3ef46822e42e3faeaed609941d2a5f85c901e29390cc0a5cafa"
+      },
+      {
+        "filename": "third_party/sherpa-onnx/cmake/onnxruntime-linux-x86_64-gpu.cmake",
+        "sha256": "81beacea2e18d2443933ce3a9a4807517ca73e77f46ec7fd76108be41d196a31"
+      },
+      {
+        "filename": "third_party/sherpa-onnx/cmake/onnxruntime-linux-x86_64-static.cmake",
+        "sha256": "2f2dc82236d4e6361802a6b0b64ab497b148485f24aeaa35bcd88cf8a8a2fc88"
+      },
+      {
+        "filename": "third_party/sherpa-onnx/cmake/onnxruntime-linux-x86_64.cmake",
+        "sha256": "5b9c901a5b6c4a323dcc64ed793bdd1490138013a78df088aafd1ca1454526f7"
+      },
+      {
+        "filename": "third_party/sherpa-onnx/cmake/onnxruntime-osx-arm64-static.cmake",
+        "sha256": "b8422656f5379ff338c810351a22981185894f6b4b0b9dc932b38e998320bf6e"
+      },
+      {
+        "filename": "third_party/sherpa-onnx/cmake/onnxruntime-osx-arm64.cmake",
+        "sha256": "e9ce69aebb924bc52b09f197b7fad9a07c2ea5f126d28d02251f9dd51e600735"
+      },
+      {
+        "filename": "third_party/sherpa-onnx/cmake/onnxruntime-osx-universal-static.cmake",
+        "sha256": "41055368a7c9285c5ebb33e672170c545bc24a62f32737fc3148397f39cf10f4"
+      },
+      {
+        "filename": "third_party/sherpa-onnx/cmake/onnxruntime-osx-universal.cmake",
+        "sha256": "8882dc863e1f8c7551f1460bd684a24c5b560337e2ac8d5adabcdcc0e92516ca"
+      },
+      {
+        "filename": "third_party/sherpa-onnx/cmake/onnxruntime-osx-x86_64-static.cmake",
+        "sha256": "a91da80a405e41ef29cd8f44412f7123bec6b874dcc5c19f3c5a8817bddc4193"
+      },
+      {
+        "filename": "third_party/sherpa-onnx/cmake/onnxruntime-osx-x86_64.cmake",
+        "sha256": "bdcf3a87be9a6a2ad2a2fb7f55721cbcc5fbd68e8b724cefac657d3da46df52d"
+      },
+      {
+        "filename": "third_party/sherpa-onnx/cmake/onnxruntime-wasm-simd.cmake",
+        "sha256": "382e9348ff6cad63452f61d823f4d5a6e8075e2afc6ed8a1244be0fa059244ea"
+      },
+      {
+        "filename": "third_party/sherpa-onnx/cmake/onnxruntime-win-arm64-static.cmake",
+        "sha256": "e87f7ea60357d68161e189b6ca1c92fca1b712307e5904181a460fd2fefb909a"
+      },
+      {
+        "filename": "third_party/sherpa-onnx/cmake/onnxruntime-win-arm64.cmake",
+        "sha256": "70214dbfbaa22510042a3aee66abb650342eecef1d552aefc68de91e2562e4cf"
+      },
+      {
+        "filename": "third_party/sherpa-onnx/cmake/onnxruntime-win-x64-directml.cmake",
+        "sha256": "3d0656d4e44b7930150d6cd229b9d9051fa844a5cbd35c7298f73e4a6433cf34"
+      },
+      {
+        "filename": "third_party/sherpa-onnx/cmake/onnxruntime-win-x64-gpu.cmake",
+        "sha256": "e0489d1d4854b516536b7035b3c93cd3317a2a7eb1ce75ebfc6f19d7a7280834"
+      },
+      {
+        "filename": "third_party/sherpa-onnx/cmake/onnxruntime-win-x64-static.cmake",
+        "sha256": "fecdaa94dcac18145667b58988769332c2a69211e9f80cfdf726e81d136ce6e9"
+      },
+      {
+        "filename": "third_party/sherpa-onnx/cmake/onnxruntime-win-x64.cmake",
+        "sha256": "4ef26e1ff20e6e02647c9cec1d772e3d66e0fe549e384423a5acdee481be4e36"
+      },
+      {
+        "filename": "third_party/sherpa-onnx/cmake/onnxruntime-win-x86-static.cmake",
+        "sha256": "f73905244ac6db783587aed18078354d4ac3182d5b6311b845b54fc18c35b863"
+      },
+      {
+        "filename": "third_party/sherpa-onnx/cmake/onnxruntime-win-x86.cmake",
+        "sha256": "63583a49677c636033aefe5fbb42d4549b98b199304dfb70d1476eff8d01b8bb"
+      },
+      {
+        "filename": "third_party/sherpa-onnx/cmake/openfst.cmake",
+        "sha256": "1658b8ba6bc449daef239cece7ebf6d0bef09665dd4a078ccf6cb66ec01e5d1f"
+      },
+      {
+        "filename": "third_party/sherpa-onnx/cmake/piper-phonemize.cmake",
+        "sha256": "b062750c938e4f4e778b9c0605a250f4abebdf17656c0d654fbace43a800258b"
+      },
+      {
+        "filename": "third_party/sherpa-onnx/cmake/portaudio.cmake",
+        "sha256": "36464f6598e96dd5dbfffbd25253bde4dceebea5492317886e0e1bacf960f79e"
+      },
+      {
+        "filename": "third_party/sherpa-onnx/cmake/pybind11.cmake",
+        "sha256": "34ceb32bc2ecc8cc9763f8c360311a23778b10d024579d1e934640728dbe3a54"
+      },
+      {
+        "filename": "third_party/sherpa-onnx/cmake/simple-sentencepiece.cmake",
+        "sha256": "d586826983cad284435f92757e9ffab7de2827d228bc58e6136077b77b90d716"
+      },
+      {
+        "filename": "third_party/sherpa-onnx/cmake/websocketpp.cmake",
+        "sha256": "b0d077245bf523723d5280bed1ebd1585ef8c625c5964952f3819c857f851101"
+      }
+    ]
+  },
+  "onnxruntime": {
+    "version": "1.27.1",
+    "source": "https://github.com/csukuangfj/onnxruntime-libs/releases/download/v1.27.1/onnxruntime-osx-arm64-static_lib-1.27.1.zip",
+    "sha256": "b9a84d5d1770818a8bb2a12d9adb45fc2cf5062b930176914cd4e7150ce3fcd2",
+    "license": "MIT",
+    "purpose": "Static native CPU inference; CoreML provider disabled",
+    "upstreamCommit": "df2ba1cf8108aa63627cf4cdf8f807880b938616",
+    "notices": [
+      {
+        "filename": "app/Resources/ONNXRuntime-LICENSE.txt",
+        "source": "https://raw.githubusercontent.com/microsoft/onnxruntime/df2ba1cf8108aa63627cf4cdf8f807880b938616/LICENSE",
+        "sha256": "2f07c72751aed99790b8a4869cf2311df85a860b22ded05fa22803587a48922c"
+      },
+      {
+        "filename": "app/Resources/ONNXRuntime-ThirdPartyNotices.txt.txt",
+        "source": "https://raw.githubusercontent.com/microsoft/onnxruntime/df2ba1cf8108aa63627cf4cdf8f807880b938616/ThirdPartyNotices.txt",
+        "sha256": "0e07b95f3a8d6230037707c5c4a2b554d12c4cb67369669ac255635528ffcee2"
+      }
+    ]
+  },
+  "blackhole-personal-audio": {
+    "version": "0.7.1",
+    "commit": "e2b22aaaba4e507a097131704bf96dabc004d9cf",
+    "tagObject": "7e9c4e9375d47abfe4b40515c5c35f0b7559936b",
+    "source": "https://github.com/ExistentialAudio/BlackHole",
+    "license": "GPL-3.0",
+    "purpose": "Separate optional personal-use HAL devices. No linkage into main app; installation needs user authorization.",
+    "sourceSHA256": "5194703e8923713d15159b951b8fe9a8be08e7c0fb7c05b17c8e865e4c2effb6",
+    "localModifications": "Unchanged C source, custom compile-time names and two channels; generated plist has unique factory UUID per bundle."
+  }
+}

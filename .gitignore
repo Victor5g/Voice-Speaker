@@ -1,0 +1,11 @@
+build/
+.build/
+cache/
+artifacts/
+tools/downloads/
+models/*.bin
+models/*.onnx
+*.xcuserstate
+xcuserdata/
+.DS_Store
+__pycache__/

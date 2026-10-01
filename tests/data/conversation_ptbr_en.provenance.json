@@ -1,0 +1,7 @@
+{
+  "type": "synthetic development fixture",
+  "sources": ["generated/ptbr.wav", "generated/enus.wav"],
+  "generator": "Existing macOS voices, invoked only by scripts/generate-speech-fixtures.sh during development",
+  "assembly": "One second silence, Portuguese fixture, two seconds silence, English fixture, one second silence",
+  "limitations": "No human speaker identity, accent, overlap, acoustic echo or real-world quality acceptance can be inferred from this fixture. Not a human recording."
+}

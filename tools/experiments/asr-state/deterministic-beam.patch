@@ -1,0 +1,43 @@
+--- whisper.cpp
++++ whisper.cpp
+@@ -6508,7 +6508,7 @@
+ static std::vector<whisper_token_data> whisper_sample_token_topk(
+             whisper_context & ctx,
+             whisper_decoder & decoder,
+-                        int   k) {
++                        int   k, bool deterministic) {
+     const auto & vocab = ctx.vocab;
+ 
+     const auto & probs    = decoder.probs;
+@@ -6531,7 +6531,7 @@
+                 logits_id.begin(),
+                 logits_id.begin() + k, logits_id.end(),
+                 [](const pair_type & a, const pair_type & b) {
+-            return a.first > b.first;
++            return a.first == b.first ? a.second < b.second : a.first > b.first;
+         });
+     }
+ 
+@@ -6563,10 +6563,11 @@
+         ptsum = sum_ts;
+     }
+ 
+-    std::discrete_distribution<> dist(probs.begin(), probs.end());
++    std::discrete_distribution<> dist;
++    if (!deterministic) dist = std::discrete_distribution<>(probs.begin(), probs.end());
+ 
+     for (int i = 0; i < k; ++i) {
+-        const auto id = dist(decoder.rng);
++        const auto id = deterministic ? logits_id[i].second : dist(decoder.rng);
+         //printf("XXX %d %d %f %f %f %f\n", id, tid, probs[id], logprobs[id], pt, ptsum);
+ 
+         result.push_back({ id, tid, probs[id], logprobs[id], pt, ptsum, -1, -1, -1, 0.0f, });
+@@ -7246,7 +7247,7 @@
+                                     } break;
+                                 case whisper_sampling_strategy::WHISPER_SAMPLING_BEAM_SEARCH:
+                                     {
+-                                        const auto tokens_new = whisper_sample_token_topk(*ctx, decoder, params.beam_search.beam_size);
++                                        const auto tokens_new = whisper_sample_token_topk(*ctx, decoder, params.beam_search.beam_size, t_cur < 1e-6f);
+ 
+                                         for (const auto & token : tokens_new) {
+                                             bc_per_dec[j].push_back({ j, decoder.seek_delta, decoder.has_ts, decoder.sequence, decoder.grammar, });
